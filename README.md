@@ -35,3 +35,7 @@ Usage
  
 By default, the log output is pretty verbose, and the scraped data is written to stdout at the end of the scrape.
 
+Questions?
+----------
+
+Comments and questions welcomed at nick (at) nickrabinowitz (dot) com.
