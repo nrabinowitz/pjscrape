@@ -1,10 +1,13 @@
+/*! 
+ * pjscrape Copyright 2011 Nick Rabinowitz.
+ * Licensed under the MIT License (see LICENSE.txt)
+ */
+
 /**
  * Scraping harness for PhantomJS. Requires PhantomJS or PyPhantomJS v.1.2
  * with saveToFile() support.
  
  TODO:
- - make pjs.addSuite take either single suite or array
- - make "none" logger
  - make csv writer use JSON.stringify for individual fields;
    consolidate code so that it's always using the array code to write
  - add support for preScrape(page) and postScrape(page) functions in config,
@@ -34,16 +37,23 @@ var pjs = (function(){
             format: 'json',
             logFile: 'pjscrape_log.txt',
             outFile: 'pjscrape_out.txt'
-        },
-        suites = [];
+        };
+        
+    var suites = [];
         
         
     // utils
     function isFunction(f) {
         return typeof f === 'function';
     }
+    function funcify(f) {
+        return isFunction(f) ? f : function() { return f };
+    }
     function isArray(a) {
         return Array.isArray(a);
+    }
+    function arrify(a) {
+        return isArray(a) ? a : [a];
     }
     function extend(obj) {
         Array.prototype.slice.call(arguments, 1).forEach(function(source) {
@@ -60,20 +70,22 @@ var pjs = (function(){
      */
     var loggers = {
         // base logger
-        base: function() {
+        base: function(logf) {
             var log = this;
-            log.log = function(msg) { console.log(msg) };
+            log.log = logf || function(msg) { console.log(msg) };
             log.msg = function(msg) { log.log('* ' + msg) };
             log.alert = function(msg) { log.log('! ' + msg) };
             log.error = function(msg) { log.log('ERROR: ' + msg) };
         },
-        // file loggers
+        // file logger
         file: function() {
-            var log = new loggers.base();
-            log.log = function(msg) { 
+            return new loggers.base(function(msg) { 
                 phantom.saveToFile(msg + "\n", config.logFile, 'a');
-            };
-            return log;
+            });
+        },
+        // no logging
+        none: function() {
+            return new loggers.base(function() {});
         }
     };
     loggers.stdout = loggers.base;
@@ -155,16 +167,14 @@ var pjs = (function(){
             // add one or more items
             w.add = function(i) {
                 // add to items
-                if (Array.isArray(i)) {
+                if (i) {
+                    i = arrify(i);
                     items = items.concat(i);
                     count += i.length;
-                } else if (i) {
-                    items.push(i);
-                    count++;
-                }
-                // write if necessary
-                if (batchSize && items.length > batchSize) {
-                    writeBatch(items.splice(0, batchSize));
+                    // write if necessary
+                    if (batchSize && items.length > batchSize) {
+                        writeBatch(items.splice(0, batchSize));
+                    }
                 }
             };
             
@@ -298,7 +308,7 @@ var pjs = (function(){
                     // completion callback
                     complete = function(page) {
                         // recurse if necessary
-                        if (s.opts.moreUrls) {
+                        if (page && s.opts.moreUrls) {
                             // look for more urls on this page
                             var moreUrls = page.evaluate(s.opts.moreUrls);
                             if (moreUrls && (!s.opts.maxDepth || s.depth < s.opts.maxDepth)) {
@@ -396,7 +406,7 @@ var pjs = (function(){
             suites.forEach(function(suite, i) {
                 SuiteManager.add(new ScraperSuite(
                     suite.title || "Suite " + i, 
-                    isArray(suite.urls) ? suite.urls : [suite.urls],
+                    arrify(suite.url),
                     suite
                 ));
             });
@@ -415,14 +425,17 @@ var pjs = (function(){
         formatters: formatters,
         writers: writers,
         config: function(key, val) {
-            if (typeof key == 'object') {
+            if (!key) {
+                return config;
+            } else if (typeof key == 'object') {
                 extend(config, key);
             } else if (val) {
                 config[key] = val;
             }
         },
-        addSuite: function(s) { suites.push(s) },
-        addSuites: function(s) { suites = suites.concat(s) },
+        addSuite: function() { 
+            suites = Array.prototype.concat.apply(suites, arguments);
+        },
         init: runner.init
     };
 }());
