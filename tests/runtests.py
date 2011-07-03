@@ -35,6 +35,22 @@ class TestPjscrapeStdout(unittest.TestCase):
         out = subprocess.check_output(COMMAND_BASE + ['test_recursive_nomaxdepth.js']).strip()
         self.assertEqual(out, '["Test Page: Index","Test Page: Page 1","Test Page: Page 2","Test Page: Page 3","Test Page: Page 4"]', 
             "Failed, got: " + out)
+            
+    def test_csv(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_csv.js']).strip()
+        # not sure why stdout uses \r\r\n, but that seems to be the case
+        self.assertEqual(out, '"a","b","c","d","e"\r\r\n"1","string","string\'s","a ""quoted"" string","111"\r\r\n"2","string","string\'s","a ""quoted"" string","222"\r\r\n"3","string","string\'s","a ""quoted"" string","333"', 
+            "Failed, got: " + out)
+            
+    def test_csv_autofields(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_csv_autofields.js']).strip()
+        self.assertEqual(out, '"Column 1","Column 2","Column 3","Column 4","Column 5"\r\r\n"1","string","string\'s","a ""quoted"" string","111"\r\r\n"2","string","string\'s","a ""quoted"" string","222"\r\r\n"3","string","string\'s","a ""quoted"" string","333"', 
+            "Failed, got: " + out)
+            
+    def test_csv_autofields_obj(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_csv_autofields_obj.js']).strip()
+        self.assertEqual(out, '"a","b","c","d","e"\r\r\n"1","string","string\'s","a ""quoted"" string","111"\r\r\n"2","string","string\'s","a ""quoted"" string","222"\r\r\n"3","string","string\'s","a ""quoted"" string","333"', 
+            "Failed, got: " + out)
         
 if __name__ == '__main__':
     # set up server

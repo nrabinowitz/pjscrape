@@ -5,15 +5,13 @@
 
 /**
  * Scraping harness for PhantomJS. Requires PhantomJS or PyPhantomJS v.1.2
- * with saveToFile() support.
+ * (with saveToFile() support, if you want to use the file writer or logger).
  
  TODO:
- - make csv writer use JSON.stringify for individual fields;
-   consolidate code so that it's always using the array code to write
  - add support for preScrape(page) and postScrape(page) functions in config,
    e.g. to inject variables or scripts into the page (postScrape needed? client or phantom?
    if client, do we need a separate config.injectScript option?)
- - Determine cause of recursive crawl crashes (memory issues?)
+ - Temp fix for memory issues?
  - Some sort of test harness (as a bookmarklet, maybe?) to do client-side scraper dev
    (could call in a file that's hosted on google code, or just do the whole thing in 
    a bookmarklet - not much code I think)
@@ -54,6 +52,11 @@ var pjs = (function(){
     }
     function arrify(a) {
         return isArray(a) ? a : [a];
+    }
+    function getKeys(o) {
+        var keys = [];
+        for (var key in o) keys.push(key);
+        return keys;
     }
     function extend(obj) {
         Array.prototype.slice.call(arguments, 1).forEach(function(source) {
@@ -106,30 +109,48 @@ var pjs = (function(){
                 return JSON.stringify(item);
             };
         },
-        // csv formatter - takes arrays or objects, requires config.csvFields
+        // csv formatter - takes arrays or objects, fields defined by config.csvFields
+        // or auto-generated based on first item
         csv: function() {
             var f = this,
-                fields = config.csvFields;
-            if (!fields || !fields.length) 
-                fail('csvFields not defined');
+                fields = config.csvFields,
+                makeRow = function(a) { return a.map(JSON.stringify).join(',') };
                 
-            f.delimiter = "\n";
-            f.start = fields.join(',') + f.delimiter;
+            f.delimiter = "\r\n";
+            f.start = fields ? makeRow(fields) + f.delimiter : '';
             f.end = '';
             f.format = function(item) {
-                if (Array.isArray(item)) {
-                    return item
+                if (item && typeof item == 'object') {
+                    var out = '';
+                    // make fields if not defined
+                    if (!fields) {
+                        if (isArray(item)) {
+                            fields = [];
+                            for (var i=0; i<item.length; i++) fields[i] = 'Column ' + (i+1);
+                        } else fields = getKeys(item);
+                        out = makeRow(fields) + f.delimiter;
+                    }
+                    // make an array out of an object if necessary
+                    if (!isArray(item)) {
+                        var tmp = [];
+                        fields.forEach(function(field) {
+                            tmp.push(item[field] || '');
+                        });
+                        item = tmp;
+                    }
+                    return out + item
+                        // too long?
                         .slice(0, fields.length)
+                        // too short?
                         .concat(item.length < fields.length ? 
                             new Array(fields.length - item.length) :
                             [])
-                        .join(',')
-                } else if (typeof item == 'object'){
-                    var out = [];
-                    fields.forEach(function(field) {
-                        out.push(item[field] || '');
-                    });
-                    return out.join(',');
+                        // quote strings if necessary, etc
+                        .map(function(v) {
+                            // escape double quotes with two double quotes
+                            return JSON.stringify(v).replace(/\\"/g, '""');
+                        })
+                        .join(',');
                 }
             };
         }
