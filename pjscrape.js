@@ -8,17 +8,18 @@
  * (with saveToFile() support, if you want to use the file writer or logger).
  
  TODO:
- - add support for preScrape(page) and postScrape(page) functions in config,
-   e.g. to inject variables or scripts into the page (postScrape needed? client or phantom?
-   if client, do we need a separate config.injectScript option?)
+ - test writer for 1 file per item (e.g. SVG scraping)
+ - tests for client utilities?
+ - anyway to fix it so that file writes are relative to the current directory, not
+   the pjscrape.js script directory?
  - Temp fix for memory issues?
  - Some sort of test harness (as a bookmarklet, maybe?) to do client-side scraper dev
    (could call in a file that's hosted on google code, or just do the whole thing in 
    a bookmarklet - not much code I think)
  - add on-the-fly dupe checks? if this is at the suite level, would only work for 
    all-one-type scrapes; at the scraper level, I'd need some way to id the content type
-   (either put the scraper in an object, or key the scrapers somehow)
- - Is PjsClient needed anymore? If so, does it need to be available to configs?
+   (either put the scraper in an object, or key the scrapers somehow) - might be good 
+   to have a default MD5-hash-based implementation
  */
  
 function fail(msg) {
@@ -51,7 +52,7 @@ var pjs = (function(){
         return Array.isArray(a);
     }
     function arrify(a) {
-        return isArray(a) ? a : [a];
+        return isArray(a) ? a : a ? [a] : [];
     }
     function getKeys(o) {
         var keys = [];
@@ -99,6 +100,14 @@ var pjs = (function(){
      * Formatter namespace
      */
     var formatters = {
+        // raw formatter - just use toString
+        raw: function() {
+            var f = this;
+            f.start = f.end = f.delimiter = '';
+            f.format = function(item) {
+                return item.toString();
+            };
+        },
         // json formatter
         json: function() {
             var f = this;
@@ -224,39 +233,42 @@ var pjs = (function(){
                 phantom.saveToFile(s, config.outFile, 'a');
             };
             return w;
-        }
+        },
+        
+        // file writer - one file per item
+        itemfile: function(log) {
+            var w = this,
+                count = 0,
+                format = config.format || 'raw',
+                formatter = new formatters[format]();
+            
+            // add+write one or more items
+            w.add = function(items) {
+                // add to items
+                if (items) {
+                    items = arrify(items);
+                    // write to separate files
+                    items.map(formatter.format).forEach(function(i) {
+                        var filename = config.outFile + '-' + (count++);
+                        phantom.saveToFile(i, config.outFile, 'w');
+                    });
+                }
+            };
+            
+            w.finish = function() {};
+            
+            w.count = function() {
+                return count;
+            };
+        },
     };
     writers.stdout = writers.base;
 
+    // suite runner
     var runner = (function() {
         var visited = {},
             log, 
             writer;
-        
-        // client-side utilities
-        var PjsClient = (function() {
-            var varName = "window._pjs";
-            return {
-                varName: varName,
-                set: function(page, name, value) {
-                    page.evaluate(new Function(varName + "." + name + " = " + JSON.stringify(value)));
-                },
-                call: function(page, fname, value) {
-                    return page.evaluate(new Function(varName + "." + name + "(" + JSON.stringify(value) + ")"));
-                },
-                injectSelf: function(page) {
-                    page.injectJs('client/pjscrape_client.js');
-                },
-                injectJquery: function(page, noConflict) {
-                    page.injectJs('client/jquery.js');
-                    if (noConflict) {
-                        page.evaluate(function() { 
-                            jQuery.noConflict(); 
-                        });
-                    }
-                }
-            };
-        }());
         
         /**
          * @class
@@ -289,15 +301,20 @@ var pjs = (function(){
          * @param {String[]} urls       Urls to scrape
          * @param {Object} opts         Configuration object
          */
-        var ScraperSuite = function(title, urls, opts, complete) {
+        var ScraperSuite = function(title, urls, opts) {
             var s = this,
                 truef = function() { return true };
             // set up options
             s.title = title;
-            s.opts = opts;
             s.urls = urls;
-            s.opts.ready = s.opts.ready || truef;
-            s.opts.scrapable = s.opts.scrapable || truef;
+            s.opts = extend({
+                ready: function() { return _pjs.ready; },
+                scrapable: truef,
+                preScrape: truef
+            }, opts);
+            // deal with potential arrays and syntax variants
+            s.opts.loadScript = arrify(opts.loadScript || opts.loadScript);
+            s.opts.scrapers = arrify(opts.scrapers || opts.scraper);
             // set up completion callback
             s.complete = function() {
                 log.msg(s.title + " complete");
@@ -318,7 +335,15 @@ var pjs = (function(){
                 // set up scraper functions
                 var scrapePage = function(page) {
                         if (page.evaluate(s.opts.scrapable)) {
-                            // run each scraper
+                            // load script(s) if necessary
+                            if (s.opts.loadScript) {
+                                s.opts.loadScript.forEach(function(script) {
+                                    page.injectJs(script);
+                                })
+                            }
+                            // run prescrape
+                            page.evaluate(s.opts.preScrape);
+                            // run each scraper and send any results to writer
                             if (scrapers && scrapers.length) {
                                 scrapers.forEach(function(scraper) {
                                     writer.add(page.evaluate(scraper))
@@ -360,10 +385,10 @@ var pjs = (function(){
             /**
              * Scrape a single page.
              * @param {String} url          Url of page to scrape
-             * @param {Function} scraper    Function to scrape page with
+             * @param {Function} scrapePage Function to scrape page with
              * @param {Function} complete   Callback function to run when complete
              */
-            scrape: function(url, scraper, complete) {
+            scrape: function(url, scrapePage, complete) {
                 var opts = this.opts,
                     page = new WebPage();
                 // set up console output
@@ -376,20 +401,25 @@ var pjs = (function(){
                         visited[url] = true;
                         log.msg('Scraping ' + url);
                         // load jQuery
-                        PjsClient.injectJquery(page, opts.noConflict);
+                        page.injectJs('client/jquery.js');
+                        if (opts.noConflict) {
+                            page.evaluate(function() { 
+                                jQuery.noConflict(); 
+                            });
+                        }
                         // load pjscrape client-side code
-                        PjsClient.injectSelf(page);
-                        // run scraper
+                        page.injectJs('client/pjscrape_client.js');
+                        // run scraper(s)
                         if (page.evaluate(opts.ready)) {
                             // run immediately
-                            scraper(page);
+                            scrapePage(page);
                             complete(page);
                         } else {
-                            // check ready() repeatedly until timeout or success
+                            // poll ready() until timeout or success
                             var elapsed = 0,
                                 timeoutId = window.setInterval(function() {
                                     if (page.evaluate(opts.ready) || elapsed > config.timeoutLimit) {
-                                        scraper(page);
+                                        scrapePage(page);
                                         window.clearInterval(timeoutId);
                                         complete(page);
                                     } else {
@@ -427,7 +457,7 @@ var pjs = (function(){
             suites.forEach(function(suite, i) {
                 SuiteManager.add(new ScraperSuite(
                     suite.title || "Suite " + i, 
-                    arrify(suite.url),
+                    arrify(suite.url || suite.urls),
                     suite
                 ));
             });
@@ -457,6 +487,9 @@ var pjs = (function(){
         addSuite: function() { 
             suites = Array.prototype.concat.apply(suites, arguments);
         },
+        addScraper: function(url, scraper) {
+            suites.push({url:url, scraper:scraper});
+        },
         init: runner.init
     };
 }());
@@ -465,13 +498,15 @@ var pjs = (function(){
 // make sure we have a config file
 if (!phantom.args.length) {
     // die
-    console.log('Usage: pjscrape.js <configfile.js>');
+    console.log('Usage: pjscrape.js <configfile.js> ...');
     phantom.exit();
 } else {
-    // load the config file
-    if (!phantom.injectJs(phantom.args[0])) {
-        fail('Config file not found: ' + phantom.args[0]);
-    }
+    // load the config file(s)
+    phantom.args.forEach(function(configFile) {
+        if (!phantom.injectJs(configFile)) {
+            fail('Config file not found: ' + configFile);
+        }
+    });
 }
 // start the scrape
 pjs.init();

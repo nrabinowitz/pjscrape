@@ -51,6 +51,26 @@ class TestPjscrapeStdout(unittest.TestCase):
         out = subprocess.check_output(COMMAND_BASE + ['test_csv_autofields_obj.js']).strip()
         self.assertEqual(out, '"a","b","c","d","e"\r\r\n"1","string","string\'s","a ""quoted"" string","111"\r\r\n"2","string","string\'s","a ""quoted"" string","222"\r\r\n"3","string","string\'s","a ""quoted"" string","333"', 
             "Failed, got: " + out)
+            
+    def test_prescrape(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_prescrape.js']).strip()
+        self.assertEqual(out, '["test1","test2"]', 
+            "preScrape failed, got: " + out)
+            
+    def test_loadscript(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_loadscript.js']).strip()
+        self.assertEqual(out, '["test1","test2"]', 
+            "loadScript failed, got: " + out)
+            
+    def test_syntax(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_syntax.js']).strip()
+        self.assertEqual(out, '["Test Page: Index","Page 1","Test Page: Index","Page 1","Page 2"]', 
+            "Syntax test failed, got: " + out)
+            
+    def test_ready(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_ready.js']).strip()
+        self.assertEqual(out, '["Content 1","Content 2"]', 
+            "Ready test failed, got: " + out)
         
 if __name__ == '__main__':
     # set up server

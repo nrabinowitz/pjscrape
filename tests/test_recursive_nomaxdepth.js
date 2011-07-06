@@ -9,9 +9,7 @@ var scraper = function() {
 pjs.addSuite({
     url: 'http://localhost:8888/test_site/index.html',
     moreUrls: function() {
-        return $('li a').map(function() {
-            return window._pjs.toFullUrl($(this).attr('href'));
-        }).toArray();
+        return _pjs.getAnchorUrls('li a');
     },
     scrapers: [scraper]
 });
