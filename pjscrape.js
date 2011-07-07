@@ -4,9 +4,16 @@
  */
 
 /**
- * Scraping harness for PhantomJS. Requires PhantomJS or PyPhantomJS v.1.2
- * (with saveToFile() support, if you want to use the file writer or logger).
- 
+ * @overview
+ * <p>Scraping harness for PhantomJS. Requires PhantomJS or PyPhantomJS v.1.2
+ * (with saveToFile() support, if you want to use the file writer or logger).</p>
+ *
+ * @name pjscrape
+ * @author Nick Rabinowitz (www.nickrabinowitz.com)
+ * @version 0.1
+ */
+
+/*
  TODO:
  - test writer for 1 file per item (e.g. SVG scraping)
  - tests for client utilities?
@@ -20,7 +27,7 @@
    all-one-type scrapes; at the scraper level, I'd need some way to id the content type
    (either put the scraper in an object, or key the scrapers somehow) - might be good 
    to have a default MD5-hash-based implementation
- */
+*/
  
 function fail(msg) {
     console.log('FATAL ERROR: ' + msg);
@@ -70,7 +77,21 @@ var pjs = (function(){
 
     /**
      * @namespace
-     * Logger namespace
+     * @name pjs.loggers
+     * Logger namespace. You can add new loggers here; new logger classes
+     * should probably extend pjs.loggers.base and redefine the 
+     * <code>log</code> method.
+     * @example
+        // create a new logger
+        pjs.loggers.myLogger = function() {
+            return new pjs.loggers.base(function(msg) { 
+                // do some special logging stuff
+            });
+        };
+        // tell pjscrape to use your logger
+        pjs.config({
+            log: 'myLogger'
+        });
      */
     var loggers = {
         // base logger
@@ -94,10 +115,24 @@ var pjs = (function(){
     };
     loggers.stdout = loggers.base;
 
-
     /**
      * @namespace
-     * Formatter namespace
+     * @name pjs.formatters
+     * Formatter namespace. You can add new formatters here; new formatter classes
+     * should have the properties start</code>, <code>end</code>, and 
+     * <code>delimiter</code>, and the method <code>format(item)</code>. You might
+     * save some time by inheriting from formatters.raw or formatters.json.
+     * @example
+        // create a new formatter
+        pjs.formatters.pipe = function() {
+            var f = new pjs.formatters.raw();
+            f.delimiter = '|';
+            return f;
+        };
+        // tell pjscrape to use your formatter
+        pjs.config({
+            format: 'pipe'
+        });
      */
     var formatters = {
         // raw formatter - just use toString
@@ -167,7 +202,23 @@ var pjs = (function(){
 
     /**
      * @namespace
-     * Writer namespace
+     * @name pjs.writers
+     * Writer namespace. You can add new writers here; new writer classes
+     * should probably extend pjs.writers.base and redefine the 
+     * <code>write</code> method.
+     * @example
+        // create a new writer
+        pjs.writer.myWriter = function(log) {
+            var w = new pjs.writers.base(log);
+            w.write = function(s) {
+                // write s to some special place
+            }
+            return w;
+        };
+        // tell pjscrape to use your writer
+        pjs.config({
+            writer: 'myWriter'
+        });
      */
     var writers = {
         // base writer
@@ -273,6 +324,7 @@ var pjs = (function(){
         /**
          * @class
          * Singleton: Manage multiple suites
+         * @private
          */
         var SuiteManager = new function() {
             var mgr = this,
@@ -297,6 +349,7 @@ var pjs = (function(){
         /**
          * @class
          * Scraper suite class - represents a set of urls to scrape
+         * @private
          * @param {String} title        Title for verbose output
          * @param {String[]} urls       Urls to scrape
          * @param {Object} opts         Configuration object
@@ -435,6 +488,10 @@ var pjs = (function(){
             }
         };
         
+        /**
+         * Run the set of configured scraper suites.
+         * @name pjs.init
+         */
         function init() {
             // check requirements
             if (!suites.length) fail('No suites configured');
@@ -475,6 +532,15 @@ var pjs = (function(){
         loggers: loggers,
         formatters: formatters,
         writers: writers,
+        init: runner.init,
+        
+        /**
+         * Set one or more config variables, applying to all suites
+         * @name pjs.config
+         * @param {String|Object} key   Either a key to set or an object with
+         *                              multiple values to set
+         * @param {mixed} [val]         Value to set if using config(key, val) syntax
+         */
         config: function(key, val) {
             if (!key) {
                 return config;
@@ -484,13 +550,26 @@ var pjs = (function(){
                 config[key] = val;
             }
         },
+        
+        /**
+         * Add one or more scraper suites to be run.
+         * @name pjs.addSuite
+         * @param {Object} suite    Scraper suite configuration object
+         * @param {Object} [...]    More suite configuration objects
+         */
         addSuite: function() { 
             suites = Array.prototype.concat.apply(suites, arguments);
         },
+        
+        /**
+         * Shorthand function to add a simple scraper suite.
+         * @name pjs.addScraper
+         * @param {String|String[]} url     URL or array of URLs to scrape
+         * @param {Function|Function[]}     Scraper function or array of scraper functions
+         */
         addScraper: function(url, scraper) {
             suites.push({url:url, scraper:scraper});
-        },
-        init: runner.init
+        }
     };
 }());
 

@@ -31,6 +31,15 @@ Usage
             ]
         });
  
+    A simple scraper can be added with the `pjs.addScraper()` function:
+ 
+        pjs.addScraper(
+            'http://www.example.com/page.html',
+            function() {
+                return $('h1').first().text();
+            }
+        );
+ 
  4. To run pjscrape from the command line, type: `pyphantomjs /path/to/pjscrape.js my_config_file.js`
  
 By default, the log output is pretty verbose, and the scraped data is written to stdout at the end of the scrape.
