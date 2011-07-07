@@ -54,7 +54,17 @@ Usage
  
  4. To run pjscrape from the command line, type: `pyphantomjs /path/to/pjscrape.js my_config_file.js`
  
-By default, the log output is pretty verbose, and the scraped data is written to stdout at the end of the scrape.
+By default, the log output is pretty verbose, and the scraped data is written as JSON to stdout at the end of the scrape. You can configure logging, formatting, and writing data using `pjs.config()`:
+
+    pjs.config({ 
+        // options: 'stdout', 'file' (set in config.logFile) or 'none'
+        log: 'stdout',
+        // options: 'json' or 'csv'
+        format: 'json',
+        // options: 'stdout' or 'file' (set in config.outFile)
+        writer: 'file',
+        outFile: 'scrape_output.json'
+    });
 
 Questions?
 ----------
