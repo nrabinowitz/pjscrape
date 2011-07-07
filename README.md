@@ -3,6 +3,18 @@ Overview
 
 **pjscrape** is a framework for anyone who's ever wanted a command-line tool for web scraping using Javascript and [jQuery](http://jquery.com/). Built to run with [PhantomJS](http://phantomjs.org), it allows you to scrape pages in a fully rendered, Javascript-enabled context from the command line, no browser required.
 
+Features
+--------
+
+ * Client-side, Javascript-based scraping environment with full access to jQuery functions
+ * Easy, flexible syntax for setting up one or more scrapers
+ * Recursive/crawl scraping
+ * Delay scrape until a "ready" condition occurs
+ * Load your own scripts on the page before scraping
+ * Modular architecture for logging and writing/formatting scraped items
+ * Client-side utilities for common tasks
+ * Growing set of unit tests
+
 Usage
 --------
 
