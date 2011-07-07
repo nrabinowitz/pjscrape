@@ -71,6 +71,11 @@ class TestPjscrapeStdout(unittest.TestCase):
         out = subprocess.check_output(COMMAND_BASE + ['test_ready.js']).strip()
         self.assertEqual(out, '["Content 1","Content 2"]', 
             "Ready test failed, got: " + out)
+            
+    def test_jquery_versions(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_jquery_versions.js']).strip()
+        self.assertEqual(out, '["1.6.1","1.6.1","1.4.1","1.6.1"]', 
+            "jQuery version test failed, got: " + out)
         
 if __name__ == '__main__':
     # set up server

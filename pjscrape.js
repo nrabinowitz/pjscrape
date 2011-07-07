@@ -26,7 +26,10 @@
  - add on-the-fly dupe checks? if this is at the suite level, would only work for 
    all-one-type scrapes; at the scraper level, I'd need some way to id the content type
    (either put the scraper in an object, or key the scrapers somehow) - might be good 
-   to have a default MD5-hash-based implementation
+   to have a default MD5-hash-based implementation (or two - one simpler, based on 
+   first 5 chars + middle 5 chars + last 5 chars + length). Hash functions should be
+   able to be specified in the suite config, so you can hash on a unique id if possible;
+   whether hash collisions are permissible or not should also be a config setting
 */
  
 function fail(msg) {
@@ -329,18 +332,31 @@ var pjs = (function(){
         var SuiteManager = new function() {
             var mgr = this,
                 complete,
-                suites = [];
+                suiteq = [];
+                
+            // create a single WebPage object for reuse
+            var page = new WebPage();
+            // set up console output
+            page.onConsoleMessage = function(msg) { log.msg('CLIENT: ' + msg) };
+            page.onAlert = function(msg) { log.alert('CLIENT: ' + msg) };
             
+            mgr.getPage = function() {
+                return page;
+            };
+            
+            // set the completion callback
             mgr.setComplete = function(cb) {
                 complete = cb;
             };
             
+            // add a ScraperSuite
             mgr.add = function(suite) {
-                suites.push(suite);
+                suiteq.push(suite);
             };
             
+            // run the next ScraperSuite in the queue
             mgr.runNext = function() {
-                var suite = suites.shift();
+                var suite = suiteq.shift();
                 if (suite) suite.run();
                 else complete();
             };
@@ -443,10 +459,7 @@ var pjs = (function(){
              */
             scrape: function(url, scrapePage, complete) {
                 var opts = this.opts,
-                    page = new WebPage();
-                // set up console output
-                page.onConsoleMessage = function(msg) { log.msg('CLIENT: ' + msg) };
-                page.onAlert = function(msg) { log.alert('CLIENT: ' + msg) };
+                    page = SuiteManager.getPage();
                 // run the scrape
                 page.open(url, function(status) {
                     if (status === "success") {
@@ -455,13 +468,17 @@ var pjs = (function(){
                         log.msg('Scraping ' + url);
                         // load jQuery
                         page.injectJs('client/jquery.js');
-                        if (opts.noConflict) {
-                            page.evaluate(function() { 
-                                jQuery.noConflict(); 
-                            });
-                        }
+                        page.evaluate(function() { 
+                            window._pjs$ = jQuery.noConflict(true); 
+                        });
                         // load pjscrape client-side code
                         page.injectJs('client/pjscrape_client.js');
+                        // reset the global jQuery vars
+                        if (!opts.noConflict) {
+                            page.evaluate(function() {
+                                window.$ = window.jQuery = window._pjs$; 
+                            });
+                        }
                         // run scraper(s)
                         if (page.evaluate(opts.ready)) {
                             // run immediately

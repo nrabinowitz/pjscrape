@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+    <title>TEST</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        window.setTimeout(function() {
+            $('#ajax_content').load('ajax_content.html');
+        }, 1000)
+    })
+    </script>
+  </head> 
+  <body>
+    <h1>Test Page: AJAX-loaded readiness</h1>
+    
+    <div id="ajax_content"></div>
+    
+  </body>
+</html>

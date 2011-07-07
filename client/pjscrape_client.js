@@ -69,11 +69,15 @@ window._pjs = (function($) {
         isLocalUrl: isLocalUrl,
         toFullUrl: toFullUrl,
         getAnchorUrls: getAnchorUrls,
-        getText: getText
+        getText: getText,
+        '$': $
     };
-}(jQuery));
+}(_pjs$));
+
 
 // bind to .ready()
-jQuery(function() {
+_pjs.$(function() {
     _pjs.ready = true;
 });
+
+console.log('Client intialized');
