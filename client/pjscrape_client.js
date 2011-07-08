@@ -80,4 +80,4 @@ _pjs.$(function() {
     _pjs.ready = true;
 });
 
-console.log('Client intialized');
+// console.log('Client initialized');

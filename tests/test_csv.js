@@ -1,5 +1,4 @@
 pjs.config({
-    log: 'none',
     format: 'csv',
     csvFields: ['a', 'b', 'c', 'd', 'e']
 });

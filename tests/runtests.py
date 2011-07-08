@@ -6,11 +6,28 @@ import subprocess
 import os
 
 PORT = 8888
-COMMAND_BASE = ["pyphantomjs", os.path.join('..', 'pjscrape.js')]
+COMMAND_BASE = ["pyphantomjs", os.path.join('..', 'pjscrape.js'), 'base_config.js']
 
+
+class QuietHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass
 
 class TestPjscrapeStdout(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        # set up server
+        cls.httpd = SocketServer.TCPServer(("", PORT), QuietHTTPRequestHandler)
+        httpd_thread = threading.Thread(target=cls.httpd.serve_forever)
+        httpd_thread.setDaemon(True)
+        httpd_thread.start()
+    
+    @classmethod
+    def tearDownClass(cls):
+        # tear down server
+        cls.httpd.shutdown()
+        
     def test_basic(self):
         out = subprocess.check_output(COMMAND_BASE + ['test_basic.js']).strip()
         self.assertEqual(out, '["Test Page: Index","Page 1","Page 2"]', 
@@ -78,12 +95,6 @@ class TestPjscrapeStdout(unittest.TestCase):
             "jQuery version test failed, got: " + out)
         
 if __name__ == '__main__':
-    # set up server
-    httpd = SocketServer.TCPServer(("", PORT), SimpleHTTPServer.SimpleHTTPRequestHandler)
-    httpd_thread = threading.Thread(target=httpd.serve_forever)
-    httpd_thread.setDaemon(True)
-    httpd_thread.start()
     # run tests
-    unittest.main()
-    # tear down server
-    httpd.shutdown()
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestPjscrapeStdout)
+    unittest.TextTestRunner(verbosity=2).run(suite)

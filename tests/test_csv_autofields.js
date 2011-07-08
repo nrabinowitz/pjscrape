@@ -1,5 +1,4 @@
 pjs.config({
-    log: 'none',
     format: 'csv'
 });
 

@@ -1,6 +1,3 @@
-pjs.config({
-    log: 'none'
-});
 
 pjs.addSuite({
     title: 'Basic Scraper Suite',

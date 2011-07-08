@@ -1,6 +1,3 @@
-pjs.config({
-    log: 'none'
-});
 
 var scraper = function() {
     return $('h1').first().text();
@@ -11,5 +8,5 @@ pjs.addSuite({
     moreUrls: function() {
         return _pjs.getAnchorUrls('li a');
     },
-    scrapers: [scraper]
+    scraper: scraper
 });

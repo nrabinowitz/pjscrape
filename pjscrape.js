@@ -15,14 +15,13 @@
 
 /*
  TODO:
- - test writer for 1 file per item (e.g. SVG scraping)
  - tests for client utilities?
- - anyway to fix it so that file writes are relative to the current directory, not
-   the pjscrape.js script directory?
- - Temp fix for memory issues?
+ - test for file writes
  - Some sort of test harness (as a bookmarklet, maybe?) to do client-side scraper dev
-   (could call in a file that's hosted on google code, or just do the whole thing in 
-   a bookmarklet - not much code I think)
+   (could call in a file that's hosted on github, or just do the whole thing in 
+   a bookmarklet - not much code I think) - I'm thinking either pop-up window or just
+   code injection + console. pjs.addSuite or pjs.addScraper would run immediately, returning
+   scraper results. pjs.config() would be moot, I think.
  - add on-the-fly dupe checks? if this is at the suite level, would only work for 
    all-one-type scrapes; at the scraper level, I'd need some way to id the content type
    (either put the scraper in an object, or key the scrapers somehow) - might be good 
@@ -30,6 +29,7 @@
    first 5 chars + middle 5 chars + last 5 chars + length). Hash functions should be
    able to be specified in the suite config, so you can hash on a unique id if possible;
    whether hash collisions are permissible or not should also be a config setting
+ - Better docs, obviously.
 */
  
 function fail(msg) {
@@ -39,7 +39,7 @@ function fail(msg) {
 
 var pjs = (function(){
     var config = {
-            timeoutInterval: 300,
+            timeoutInterval: 100,
             timeoutLimit: 3000,
             log: 'stdout',
             writer: 'stdout',
@@ -302,9 +302,20 @@ var pjs = (function(){
                 if (items) {
                     items = arrify(items);
                     // write to separate files
-                    items.map(formatter.format).forEach(function(i) {
-                        var filename = config.outFile + '-' + (count++);
-                        phantom.saveToFile(i, config.outFile, 'w');
+                    items.forEach(function(item) {
+                        var filename;
+                        // support per-item filename syntax
+                        if (item.filename && item.content) {
+                            filename = item.filename;
+                            item = item.content;
+                        } 
+                        // otherwise add a serial number to config.outFile
+                        else {
+                            var fileparts = config.outFile.split('.'),
+                                ext = fileparts.pop();
+                            filename = fileparts.join('.') + '-' + (count++) + '.' + ext;
+                        }
+                        phantom.saveToFile(formatter.format(item), filename, 'w');
                     });
                 }
             };
