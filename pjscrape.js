@@ -393,7 +393,7 @@ var pjs = (function(){
                 preScrape: truef
             }, opts);
             // deal with potential arrays and syntax variants
-            s.opts.loadScript = arrify(opts.loadScript || opts.loadScript);
+            s.opts.loadScript = arrify(opts.loadScripts || opts.loadScript);
             s.opts.scrapers = arrify(opts.scrapers || opts.scraper);
             // set up completion callback
             s.complete = function() {
