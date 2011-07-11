@@ -15,7 +15,7 @@ window._pjs = (function($) {
      * @param {String} url      URL to check
      */
     function isLocalUrl(url) {
-        return !url.match(/^https?:\/\//) || url.indexOf(base) === 0;
+        return !url.match(/^(https?:\/\/|mailto:)/) || url.indexOf(base) === 0;
     }
     
     /**

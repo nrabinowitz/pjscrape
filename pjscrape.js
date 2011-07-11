@@ -431,6 +431,10 @@ var pjs = (function(){
                             }
                         }
                     },
+                    // get base URL for avoiding repeat visits and recursion loops
+                    baseUrl = function(url) {
+                        return s.opts.newHashNewPage ? url.split('#')[0] : url;
+                    },
                     // completion callback
                     complete = function(page) {
                         // recurse if necessary
@@ -438,7 +442,12 @@ var pjs = (function(){
                             // look for more urls on this page
                             var moreUrls = page.evaluate(s.opts.moreUrls);
                             if (moreUrls && (!s.opts.maxDepth || s.depth < s.opts.maxDepth)) {
-                                moreUrls.filter(function(url) { return !(url in visited)});
+                                // avoid repeat visits
+                                moreUrls = moreUrls.map(baseUrl).filter(function(url) {
+                                    console.log("URL: " + url);
+                                    console.log("Visited: " + JSON.stringify(visited));
+                                    return !(url in visited);
+                                });
                                 if (moreUrls.length) {
                                     log.msg('Found ' + moreUrls.length + ' additional urls to scrape');
                                     // make a new sub-suite
@@ -454,7 +463,7 @@ var pjs = (function(){
                 var runCounter = 0
                 function runNext() {
                     if (runCounter < s.urls.length) {
-                        s.scrape(s.urls[runCounter++], scrapePage, complete);
+                        s.scrape(baseUrl(s.urls[runCounter++]), scrapePage, complete);
                     } else {
                         s.complete();
                     }
