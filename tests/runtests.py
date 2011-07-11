@@ -58,6 +58,11 @@ class TestPjscrapeStdout(unittest.TestCase):
         self.assertEqual(out, '["Test Page: Loop 1","Test Page: Loop 2"]', 
             "Failed, got: " + out)
             
+    def test_recursive_allowrepeat(self):
+        out = subprocess.check_output(COMMAND_BASE + ['test_recursive_allowrepeat.js']).strip()
+        self.assertEqual(out, '["Test Page: Loop 1","Test Page: Loop 2","Test Page: Loop 1","Test Page: Loop 2","Test Page: Loop 1"]', 
+            "Failed, got: " + out)
+            
     def test_csv(self):
         out = subprocess.check_output(COMMAND_BASE + ['test_csv.js']).strip()
         # not sure why stdout uses \r\r\n, but that seems to be the case

@@ -442,12 +442,6 @@ var pjs = (function(){
                             // look for more urls on this page
                             var moreUrls = page.evaluate(s.opts.moreUrls);
                             if (moreUrls && (!s.opts.maxDepth || s.depth < s.opts.maxDepth)) {
-                                // avoid repeat visits
-                                moreUrls = moreUrls.map(baseUrl).filter(function(url) {
-                                    console.log("URL: " + url);
-                                    console.log("Visited: " + JSON.stringify(visited));
-                                    return !(url in visited);
-                                });
                                 if (moreUrls.length) {
                                     log.msg('Found ' + moreUrls.length + ' additional urls to scrape');
                                     // make a new sub-suite
@@ -463,7 +457,14 @@ var pjs = (function(){
                 var runCounter = 0
                 function runNext() {
                     if (runCounter < s.urls.length) {
-                        s.scrape(baseUrl(s.urls[runCounter++]), scrapePage, complete);
+                        url = baseUrl(s.urls[runCounter++]);
+                        // avoid repeat visits
+                        if (!config.allowRepeatUrls && url in visited) {
+                            runNext();
+                        } else {
+                            // scrape this url
+                            s.scrape(url, scrapePage, complete);
+                        }
                     } else {
                         s.complete();
                     }
