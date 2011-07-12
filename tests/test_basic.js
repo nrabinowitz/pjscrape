@@ -1,9 +1,8 @@
 pjs.addSuite({
-    title: 'Basic Scraper Suite',
     url: 'http://localhost:8888/test_site/index.html',
     scrapers: [
         function() {
-            var items = []
+            var items = [];
             items.push($('h1').first().text());
             $('li a').each(function() {
                 items.push($(this).text());

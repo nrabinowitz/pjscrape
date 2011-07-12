@@ -22,15 +22,10 @@
    a bookmarklet - not much code I think) - I'm thinking either pop-up window or just
    code injection + console. pjs.addSuite or pjs.addScraper would run immediately, returning
    scraper results. pjs.config() would be moot, I think.
- - add on-the-fly dupe checks? if this is at the suite level, would only work for 
-   all-one-type scrapes; at the scraper level, I'd need some way to id the content type
-   (either put the scraper in an object, or key the scrapers somehow) - might be good 
-   to have a default MD5-hash-based implementation (or two - one simpler, based on 
-   first 5 chars + middle 5 chars + last 5 chars + length). Hash functions should be
-   able to be specified in the suite config, so you can hash on a unique id if possible;
-   whether hash collisions are permissible or not should also be a config setting
  - Better docs, obviously.
 */
+
+phantom.injectJs('lib/md5.js');
  
 function fail(msg) {
     console.log('FATAL ERROR: ' + msg);
@@ -328,10 +323,43 @@ var pjs = (function(){
         },
     };
     writers.stdout = writers.base;
+    
+    /**
+     * @namespace
+     * @name pjs.hashFunctions
+     * Hash function namespace. You can add new hash functions here; hash functions
+     * should take an item and return a unique (or unique-enough) string. 
+     * @example
+        // create a new hash function
+        pjs.hashFunctions.myHash = function(item) {
+            return item.mySpecialUID;
+        };
+        // tell pjscrape to ignore dupes
+        pjs.config({
+            ignoreDuplicates: true
+        });
+        // tell pjscrape to use your hash function
+        pjs.addScraper({
+            hashFunction: 'myHash',
+            // etc
+        });
+     */
+    var hashFunctions = {
+        // UID hash - assumes item.id; falls back on md5
+        id: function(item) {
+            return ('id' in item) ? item.id : hashFunctions.md5(item);
+        },
+        // md5 hash - may allow collisions
+        md5: function(item) {
+            return md5(JSON.stringify(item));
+        }
+    };
+     
 
     // suite runner
     var runner = (function() {
         var visited = {},
+            itemHashes = {},
             log, 
             writer;
         
@@ -390,7 +418,8 @@ var pjs = (function(){
             s.opts = extend({
                 ready: function() { return _pjs.ready; },
                 scrapable: truef,
-                preScrape: truef
+                preScrape: truef,
+                hashFunction: hashFunctions.id
             }, opts);
             // deal with potential arrays and syntax variants
             s.opts.loadScript = arrify(opts.loadScripts || opts.loadScript);
@@ -404,6 +433,33 @@ var pjs = (function(){
         }
         
         ScraperSuite.prototype = {
+        
+            /**
+             * Add an item, checking for duplicates as necessary
+             * @param {Object|Array} items      Item(s) to add
+             */
+            addItem: function(items) {
+                var s = this;
+                if (items && config.ignoreDuplicates) {
+                    // ensure array
+                    items = arrify(items);
+                    items = items.filter(function(item) {
+                        var hash = s.opts.hashFunction(item);
+                        if (!itemHashes[hash]) {
+                            // hash miss - new item
+                            itemHashes[hash] = true;
+                            return true;
+                        } else {
+                            // hash hit - likely duplicate
+                            // Could do a second-layer check against the actual object,
+                            // but that requires retaining items in memory - skip for now
+                            return false;
+                        }
+                    });
+                }
+                writer.add(items);
+            },
+            
             /**
              * Run the suite, scraping each url
              */
@@ -426,7 +482,7 @@ var pjs = (function(){
                             // run each scraper and send any results to writer
                             if (scrapers && scrapers.length) {
                                 scrapers.forEach(function(scraper) {
-                                    writer.add(page.evaluate(scraper))
+                                    s.addItem(page.evaluate(scraper))
                                 });
                             }
                         }
@@ -481,6 +537,7 @@ var pjs = (function(){
             scrape: function(url, scrapePage, complete) {
                 var opts = this.opts,
                     page = SuiteManager.getPage();
+                log.msg('Opening ' + url);
                 // run the scrape
                 page.open(url, function(status) {
                     if (status === "success") {
@@ -570,6 +627,7 @@ var pjs = (function(){
         loggers: loggers,
         formatters: formatters,
         writers: writers,
+        hashFunctions: hashFunctions,
         init: runner.init,
         
         /**
