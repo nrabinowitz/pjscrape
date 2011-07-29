@@ -16,6 +16,7 @@
 /*
  TODO:
  - tests for client utilities?
+ - docs for the Logger, Formatter, Writer, and HashFunction interfaces?
  - test for file writes
  - Some sort of test harness (as a bookmarklet, maybe?) to do client-side scraper dev
    (could call in a file that's hosted on github, or just do the whole thing in 
