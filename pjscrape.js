@@ -8,7 +8,7 @@
  * <p>Scraping harness for PhantomJS. Requires PhantomJS or PyPhantomJS v.1.2
  * (with saveToFile() support, if you want to use the file writer or logger).</p>
  *
- * @name pjscrape
+ * @name pjscrape.js
  * @author Nick Rabinowitz (www.nickrabinowitz.com)
  * @version 0.1
  */
@@ -32,6 +32,11 @@ function fail(msg) {
     phantom.exit();
 };
 
+/**
+ * @namespace
+ * Root namespace for PhantomJS-side code
+ * @name pjs
+ */
 var pjs = (function(){
     var config = {
             timeoutInterval: 100,
@@ -74,8 +79,8 @@ var pjs = (function(){
     };
 
     /**
-     * @namespace
      * @name pjs.loggers
+     * @namespace
      * Logger namespace. You can add new loggers here; new logger classes
      * should probably extend pjs.loggers.base and redefine the 
      * <code>log</code> method.
@@ -92,30 +97,60 @@ var pjs = (function(){
         });
      */
     var loggers = {
-        // base logger
+        /** 
+         * @name pjs.loggers.base
+         * @class Abstract base logger class
+         */
         base: function(logf) {
             var log = this;
             log.log = logf || function(msg) { console.log(msg) };
+            /** Log a normal message
+             * @function
+             * @param {String} msg
+             * @name pjs.loggers.base#msg */
             log.msg = function(msg) { log.log('* ' + msg) };
+            /** Log an alert message
+             * @function
+             * @param {String} msg
+             * @name pjs.loggers.base#alert */
             log.alert = function(msg) { log.log('! ' + msg) };
+            /** Log an error message
+             * @function
+             * @param {String} msg
+             * @name pjs.loggers.base#error */
             log.error = function(msg) { log.log('ERROR: ' + msg) };
         },
-        // file logger
+        
+        /**
+         * @name pjs.loggers.file
+         * @class Log to config.logFile
+         * @extends pjs.loggers.base
+         */
         file: function() {
             return new loggers.base(function(msg) { 
                 phantom.saveToFile(msg + "\n", config.logFile, 'a');
             });
         },
-        // no logging
+        
+        /**
+         * Disable logging
+         * @name pjs.loggers.none
+         */
         none: function() {
             return new loggers.base(function() {});
         }
     };
+        
+    /**
+     * @name pjs.loggers.stdout
+     * @class Log to STDOUT
+     * @extends pjs.loggers.base
+     */
     loggers.stdout = loggers.base;
 
     /**
-     * @namespace
      * @name pjs.formatters
+     * @namespace
      * Formatter namespace. You can add new formatters here; new formatter classes
      * should have the properties start</code>, <code>end</code>, and 
      * <code>delimiter</code>, and the method <code>format(item)</code>. You might
@@ -133,7 +168,29 @@ var pjs = (function(){
         });
      */
     var formatters = {
-        // raw formatter - just use toString
+        /** @class Abstract base formatter class. This is just an interface -
+         * it can't actually be used.
+         * @name pjs.formatters.base */
+        /** Format an item as a string for output
+         * @function
+         * @param {Object|String|Array} Item to format
+         * @return {String}             Formatted output
+         * @name pjs.formatters.base#format */
+        /** String to prepend to output
+         * @name pjs.formatters.base#start 
+         * @type String */
+        /** String to append to output
+         * @name pjs.formatters.base#end 
+         * @type String */
+        /** String to insert as a delimiter between items
+         * @name pjs.formatters.base#delimiter 
+         * @type String */
+        
+        /** 
+         * @name pjs.formatters.raw 
+         * @class Raw formatter - just uses toString()
+         * @extends pjs.formatters.base
+         */
         raw: function() {
             var f = this;
             f.start = f.end = f.delimiter = '';
@@ -141,7 +198,12 @@ var pjs = (function(){
                 return item.toString();
             };
         },
-        // json formatter
+        
+        /** 
+         * @name pjs.formatters.json 
+         * @class Format output as a JSON array
+         * @extends pjs.formatters.base
+         */
         json: function() {
             var f = this;
             f.start = '[';
@@ -151,8 +213,13 @@ var pjs = (function(){
                 return JSON.stringify(item);
             };
         },
-        // csv formatter - takes arrays or objects, fields defined by config.csvFields
-        // or auto-generated based on first item
+        
+        /** 
+         * @name pjs.formatters.csv 
+         * @class CSV formatter - takes arrays or objects, fields defined by 
+         * config.csvFields or auto-generated based on first item
+         * @extends pjs.formatters.base
+         */
         csv: function() {
             var f = this,
                 fields = config.csvFields,
@@ -199,8 +266,8 @@ var pjs = (function(){
     };
 
     /**
-     * @namespace
      * @name pjs.writers
+     * @namespace
      * Writer namespace. You can add new writers here; new writer classes
      * should probably extend pjs.writers.base and redefine the 
      * <code>write</code> method.
@@ -219,7 +286,10 @@ var pjs = (function(){
         });
      */
     var writers = {
-        // base writer
+        /** 
+         * @name pjs.writers.base
+         * @class Abstract base writer class
+         */
         base: function(log) {
             var w = this,
                 count = 0,
@@ -243,7 +313,12 @@ var pjs = (function(){
                 firstWrite = false;
             };
             
-            // add one or more items
+            /** 
+             * Add an item to be written to output
+             * @name pjs.writers.base#add 
+             * @function
+             * @param {Object|String|Array} Item to add
+             */
             w.add = function(i) {
                 // add to items
                 if (i) {
@@ -257,22 +332,42 @@ var pjs = (function(){
                 }
             };
             
+            /** 
+             * Finish up writing output
+             * @name pjs.writers.base#finish 
+             * @function
+             */
             w.finish = function() {
                 lastWrite = true;
                 writeBatch(items);
             };
             
+            /** 
+             * Get the number of items written to output
+             * @name pjs.writers.base#count 
+             * @function
+             * @return {Number}     Number of items written
+             */
             w.count = function() {
                 return count;
             };
             
-            // write to std out
+            /** 
+             * Write a string to output
+             * @name pjs.writers.base#write 
+             * @function
+             * @param {String} s    String to write
+             */
             w.write = function(s) { 
                 console.log(s);
             };
         },
         
-        // file writer
+        /** 
+         * @name pjs.writers.file 
+         * @class Writes output to config.outFile
+         * @extends pjs.writers.base
+         */
         file: function(log) {
             var w = new writers.base(log);
             // clear file
@@ -284,14 +379,20 @@ var pjs = (function(){
             return w;
         },
         
-        // file writer - one file per item
+        /** 
+         * @name pjs.writers.itemfile 
+         * @class Writes output to one file per item. Items may be provided
+         * in the format <code>{ filename: "file.txt", content: "string" }</code>
+         * if you'd like to specify the filename in the scraper. Otherwise,
+         * files are written to config.outFile with serial numbering.
+         * @extends pjs.writers.base
+         */
         itemfile: function(log) {
             var w = this,
                 count = 0,
                 format = config.format || 'raw',
                 formatter = new formatters[format]();
             
-            // add+write one or more items
             w.add = function(items) {
                 // add to items
                 if (items) {
@@ -322,11 +423,17 @@ var pjs = (function(){
             };
         },
     };
+        
+    /**
+     * @name pjs.writers.stdout
+     * @class Write output to STDOUT
+     * @extends pjs.writers.base
+     */
     writers.stdout = writers.base;
     
     /**
-     * @namespace
      * @name pjs.hashFunctions
+     * @namespace
      * Hash function namespace. You can add new hash functions here; hash functions
      * should take an item and return a unique (or unique-enough) string. 
      * @example
@@ -441,6 +548,7 @@ var pjs = (function(){
             /**
              * Add an item, checking for duplicates as necessary
              * @param {Object|Array} items      Item(s) to add
+             * @private
              */
             addItem: function(items) {
                 var s = this;
@@ -466,6 +574,7 @@ var pjs = (function(){
             
             /**
              * Run the suite, scraping each url
+             * @private
              */
             run: function() {
                 var s = this,
@@ -537,6 +646,7 @@ var pjs = (function(){
              * @param {String} url          Url of page to scrape
              * @param {Function} scrapePage Function to scrape page with
              * @param {Function} complete   Callback function to run when complete
+             * @private
              */
             scrape: function(url, scrapePage, complete) {
                 var opts = this.opts,
