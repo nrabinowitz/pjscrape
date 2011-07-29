@@ -97,34 +97,24 @@ var pjs = (function(){
         });
      */
     var loggers = {
+    
         /** 
          * @name pjs.loggers.base
          * @class Abstract base logger class
+         * @private
          */
         base: function(logf) {
             var log = this;
             log.log = logf || function(msg) { console.log(msg) };
-            /** Log a normal message
-             * @function
-             * @param {String} msg
-             * @name pjs.loggers.base#msg */
             log.msg = function(msg) { log.log('* ' + msg) };
-            /** Log an alert message
-             * @function
-             * @param {String} msg
-             * @name pjs.loggers.base#alert */
             log.alert = function(msg) { log.log('! ' + msg) };
-            /** Log an error message
-             * @function
-             * @param {String} msg
-             * @name pjs.loggers.base#error */
             log.error = function(msg) { log.log('ERROR: ' + msg) };
         },
         
-        /**
+        /** 
+         * Log to config.logFile
          * @name pjs.loggers.file
-         * @class Log to config.logFile
-         * @extends pjs.loggers.base
+         * @type Logger
          */
         file: function() {
             return new loggers.base(function(msg) { 
@@ -135,6 +125,7 @@ var pjs = (function(){
         /**
          * Disable logging
          * @name pjs.loggers.none
+         * @type Logger
          */
         none: function() {
             return new loggers.base(function() {});
@@ -142,9 +133,9 @@ var pjs = (function(){
     };
         
     /**
+     * Log to STDOUT
      * @name pjs.loggers.stdout
-     * @class Log to STDOUT
-     * @extends pjs.loggers.base
+     * @type Logger
      */
     loggers.stdout = loggers.base;
 
@@ -168,28 +159,11 @@ var pjs = (function(){
         });
      */
     var formatters = {
-        /** @class Abstract base formatter class. This is just an interface -
-         * it can't actually be used.
-         * @name pjs.formatters.base */
-        /** Format an item as a string for output
-         * @function
-         * @param {Object|String|Array} Item to format
-         * @return {String}             Formatted output
-         * @name pjs.formatters.base#format */
-        /** String to prepend to output
-         * @name pjs.formatters.base#start 
-         * @type String */
-        /** String to append to output
-         * @name pjs.formatters.base#end 
-         * @type String */
-        /** String to insert as a delimiter between items
-         * @name pjs.formatters.base#delimiter 
-         * @type String */
         
         /** 
+         * Raw formatter - just uses toString()
          * @name pjs.formatters.raw 
-         * @class Raw formatter - just uses toString()
-         * @extends pjs.formatters.base
+         * @type Formatter
          */
         raw: function() {
             var f = this;
@@ -200,9 +174,9 @@ var pjs = (function(){
         },
         
         /** 
+         * Format output as a JSON array
          * @name pjs.formatters.json 
-         * @class Format output as a JSON array
-         * @extends pjs.formatters.base
+         * @type Formatter
          */
         json: function() {
             var f = this;
@@ -215,10 +189,10 @@ var pjs = (function(){
         },
         
         /** 
-         * @name pjs.formatters.csv 
-         * @class CSV formatter - takes arrays or objects, fields defined by 
+         * CSV formatter - takes arrays or objects, fields defined by 
          * config.csvFields or auto-generated based on first item
-         * @extends pjs.formatters.base
+         * @name pjs.formatters.csv 
+         * @type Formatter
          */
         csv: function() {
             var f = this,
@@ -268,9 +242,12 @@ var pjs = (function(){
     /**
      * @name pjs.writers
      * @namespace
-     * Writer namespace. You can add new writers here; new writer classes
+     * <p>Writer namespace. You can add new writers here; new writer classes
      * should probably extend pjs.writers.base and redefine the 
-     * <code>write</code> method.
+     * <code>write</code> method.</p>
+     * <p>Items returned by scrapers will be added to the output via
+     * <code>Writer.add(item)</code>, which can take any type of object. If
+     * an array is provided, multipled items will be added.
      * @example
         // create a new writer
         pjs.writer.myWriter = function(log) {
@@ -289,6 +266,7 @@ var pjs = (function(){
         /** 
          * @name pjs.writers.base
          * @class Abstract base writer class
+         * @private
          */
         base: function(log) {
             var w = this,
@@ -364,9 +342,9 @@ var pjs = (function(){
         },
         
         /** 
+         * Writes output to config.outFile
          * @name pjs.writers.file 
-         * @class Writes output to config.outFile
-         * @extends pjs.writers.base
+         * @type Writer
          */
         file: function(log) {
             var w = new writers.base(log);
@@ -380,12 +358,12 @@ var pjs = (function(){
         },
         
         /** 
-         * @name pjs.writers.itemfile 
-         * @class Writes output to one file per item. Items may be provided
+         * Writes output to one file per item. Items may be provided
          * in the format <code>{ filename: "file.txt", content: "string" }</code>
          * if you'd like to specify the filename in the scraper. Otherwise,
          * files are written to config.outFile with serial numbering.
-         * @extends pjs.writers.base
+         * @name pjs.writers.itemfile 
+         * @type Writer
          */
         itemfile: function(log) {
             var w = this,
@@ -425,9 +403,9 @@ var pjs = (function(){
     };
         
     /**
+     * Write output to STDOUT
      * @name pjs.writers.stdout
-     * @class Write output to STDOUT
-     * @extends pjs.writers.base
+     * @type Writer
      */
     writers.stdout = writers.base;
     
@@ -452,11 +430,17 @@ var pjs = (function(){
         });
      */
     var hashFunctions = {
-        // UID hash - assumes item.id; falls back on md5
+        /** UID hash - assumes item.id; falls back on md5
+         * @name pjs.hashFunctions.id
+         * @type HashFunction
+         */
         id: function(item) {
             return ('id' in item) ? item.id : hashFunctions.md5(item);
         },
-        // md5 hash - may allow collisions
+        /** md5 hash - collisions are possible
+         * @name pjs.hashFunctions.md5
+         * @type HashFunction
+         */
         md5: function(item) {
             return md5(JSON.stringify(item));
         }
