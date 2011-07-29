@@ -376,7 +376,11 @@ var pjs = (function(){
             // create a single WebPage object for reuse
             var page = new WebPage();
             // set up console output
-            page.onConsoleMessage = function(msg) { log.msg('CLIENT: ' + msg) };
+            page.onConsoleMessage = function(msg, line, id) {
+                id = id || 'pjscrape.js or injected code';
+                if (line) msg += ' (' + id + ' line ' + line + ')';
+                log.msg('CLIENT: ' + msg);
+            };
             page.onAlert = function(msg) { log.alert('CLIENT: ' + msg) };
             
             mgr.getPage = function() {
@@ -567,6 +571,9 @@ var pjs = (function(){
                             var elapsed = 0,
                                 timeoutId = window.setInterval(function() {
                                     if (page.evaluate(opts.ready) || elapsed > config.timeoutLimit) {
+                                        if (elapsed > config.timeoutLimit) {
+                                            log.alert('Ready timeout after ' + ~~(elapsed / 1000) + ' seconds');
+                                        }
                                         scrapePage(page);
                                         window.clearInterval(timeoutId);
                                         complete(page);

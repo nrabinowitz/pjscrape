@@ -100,6 +100,10 @@ class TestPjscrape(unittest.TestCase):
         out = getPjscrapeOutput('test_ignore_duplicates_id.js')
         # keys in alphabetical order due to http://code.google.com/p/phantomjs/issues/detail?id=170
         self.assertEqual(out, '[{"a":"test","i":0,"id":"1"},{"a":"test","i":1,"id":"2"}]')
+            
+    def test_img_input(self):
+        out = getPjscrapeOutput('test_img_input.js')
+        self.assertEqual(out, '["Test Page: Weird Image Input Issue"]')
         
 if __name__ == '__main__':
     # run tests

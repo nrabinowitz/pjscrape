@@ -75,10 +75,8 @@ window._pjs = (function($) {
 }(_pjs$));
 
 // bind to .ready()
-window._pjs.$(function() {
-    window._pjs.ready = true;
+_pjs.$(function() {
+    _pjs.ready = true;
 });
 
-// for reasons I can't fathom, omitting this line throws an
-// error on pages with <input type="image">. Go figure.
-console.log('Client-side code initialized');
+// console.log('Client initialized');
