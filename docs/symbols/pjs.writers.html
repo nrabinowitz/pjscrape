@@ -1,0 +1,554 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="generator" content="JsDoc Toolkit" />
+		
+		<title>pjscrape 
+                v.0.1
+                : pjs.writers : JsDoc Reference</title>
+
+		<style type="text/css">
+			/* default.css */
+body {
+	font: 13px Verdana, Arial, sans-serif;
+    padding: 0;
+    margin: 15px;
+}
+
+.header {
+	clear: both;
+	background-color: #ccc;
+	padding: 8px;
+}
+a:link, a:visited {
+    color: #00A;
+}
+a:hover, a:active {
+    color: #00F;
+}
+h1 {
+	font-size: 150%;
+	font-weight: bold;
+	padding: 0;
+}
+h3.projectTitle {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0;
+}
+h1.classTitle {
+	font-size:170%;
+	line-height:130%;
+}
+
+hr {
+	border: none 0;
+	border-top: 1px solid #627C9D;
+	height: 1px;
+    margin: 1em 0;
+}
+
+pre.code {
+	display: block;
+	padding: 8px;
+	border: 1px dashed #ccc;
+    overflow: auto;
+}
+
+#index {
+	float: left;
+	width: 220px;
+	position: absolute;
+    margin-bottom: 15px;
+	left: 8px;
+	background-color: #F3F3F3;
+	padding: 8px;
+}
+
+#content {
+	margin-left: 260px;
+	width: 600px;
+}
+
+#index img {
+    margin: 15px 0;
+    border: 1px solid #627C9D;
+}
+
+ul.classList {
+	list-style-type: none;
+	padding: 0;
+    margin: 0;
+	font-size: 11px;
+}
+
+ul.classList li {
+	padding: 0;
+	margin: 0 0 8px 0;
+}
+
+h2 , div.sectionTitle { 
+    font-weight: bold;
+	font-size: 18px;
+	padding: 15px 0 10px 0;
+    margin: 0;
+}
+div.sectionTitle {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #627C9D;
+}
+
+code {
+	font-family: "Lucida Console", "Courier New", Courier, monospace; 
+	font-size: 12px;
+}
+pre {
+	font-family: "Lucida Console", "Courier New", Courier, monospace; 
+	font-size: 12px;
+}
+div.toplinks {
+    font-size: 11px;
+    padding-top: 8px;
+}
+
+td.attributes, .fixedFont
+{
+	font-family: "Lucida Console", "Courier New", Courier, monospace; 
+	font-size: 12px;
+}
+
+/* tables */
+.summaryTable {
+    text-align: left;
+	margin: 10px 0;
+	border: 1px solid #999999;
+	width: 100%;
+}
+.summaryTable th {
+	color: #FFFFFF;
+	background-color: #627C9D;
+	white-space: nowrap;
+    padding: 3px 10px;
+}
+.summaryTable th.param {
+	color: #000;
+	background-color: #F2F2F2;
+	white-space: nowrap;
+    padding: 3px 10px;
+}
+.summaryTable td {
+	border-top: #999999 1px solid;
+	vertical-align: top;
+    padding: 5px 10px;
+}
+.summaryTable.params {
+    width: auto;
+}
+.row0 {
+	background-color: #F2F2F2;
+}
+.row1 {
+	background-color: #FFFFFF;
+}
+
+ul.inheritsList
+{
+	list-style: square;
+	margin-left: 20px;
+	padding-left: 0;
+}
+
+.detailList dt
+{
+    float: left;
+    clear: both;
+	font-weight: bold;
+	margin-left: 0;
+}
+.detailList dd { 
+	padding-bottom: .5em;
+    margin-left: 7em; 
+}
+.detailList dd.tight {
+    padding-bottom: 0;
+}
+.membertitle {
+    font-size: 1.2em;
+    padding: .5em;
+    margin: 2.5em 0px 0.2em;
+    background: #EEF;
+    border-bottom: 3px double #999;
+}
+.membername {
+    font-weight: bold;
+}
+.datatype {
+    color: #999;
+}
+.paramname {
+    font-weight: bold;
+}
+.paramconfig {
+    color: #999;
+}
+.optional {
+	font-style: italic;
+}
+.defaultvalue {
+	font-style: italic;
+}
+
+.light, td.attributes, .light a:link, .light a:visited
+{
+	color: #777;
+	font-style: italic;
+}
+
+div.indexClass {
+    border-top: 1px solid #7F8FB1;
+    margin-bottom: .5em;
+}
+
+/* syntax coloring for examples */
+.KEYW {color: #339; font-weight: bold;}
+.COMM {color: #999; font-style: italic;}
+.NUMB {color: #933;}
+.STRN {color: #393;}
+.REGX {color: #993;}
+
+.fineprint
+{
+	text-align: right;
+	font-size: 10px;
+}
+		</style>
+	</head>
+
+	<body>
+<!-- ============================== header ================================= -->	
+		<!-- begin static/header.html -->
+		<div id="header">
+</div>
+		<!-- end static/header.html -->
+
+<!-- ============================== classes index ============================ -->
+		<div id="index">
+            <h3 class="projectTitle">pjscrape 
+                v.0.1
+            </h3>
+            <div class="toplinks"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+            
+            
+                <hr>
+            
+			<!-- begin publish.classesIndex -->
+			<ul class="classList">
+	
+	<li><a href="../symbols/_pjs.html">_pjs</a></li>
+	
+	<li><a href="../symbols/pjs.html">pjs</a></li>
+	
+	<li><a href="../symbols/pjs.formatters.html">pjs.formatters</a></li>
+	
+	<li><a href="../symbols/pjs.hashFunctions.html">pjs.hashFunctions</a></li>
+	
+	<li><a href="../symbols/pjs.loggers.html">pjs.loggers</a></li>
+	
+	<li><a href="../symbols/pjs.writers.html">pjs.writers</a></li>
+	
+</ul>
+			<!-- end publish.classesIndex -->
+		</div>
+		
+		<div id="content">
+<!-- ============================== class title ============================ -->
+			<h1 class="classTitle">
+				
+				Namespace pjs.writers
+			</h1>
+
+<!-- ============================== class summary ========================== -->			
+            <dl class="detailList">
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                    <dt>Defined in:</dt>
+                    <dd><a href="../symbols/src/c__Users_nick_Documents_miscellaneous_pjscrape_pjscrape_pjscrape.js.html">pjscrape.js</a></dd>
+                
+            
+                
+            </dl>
+
+            <p class="description">
+				<p>Writer namespace. You can add new writers here; new writer classesshould probably extend pjs.writers.base and redefine the <code>write</code> method.</p><p>Items returned by scrapers will be added to the output via<code>Writer.add(item)</code>, which can take any type of object. Ifan array is provided, multipled items will be added.
+			</p>
+            
+            
+				
+                    <pre class="code"><span class="WHIT">
+</span><span class="WHIT">        </span><span class="COMM">// create a new writer</span><span class="WHIT">
+</span><span class="WHIT">        </span><span class="NAME">pjs.writer.myWriter</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">log</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+</span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">w</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">pjs.writers.base</span><span class="PUNC">(</span><span class="NAME">log</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+</span><span class="WHIT">            </span><span class="NAME">w.write</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+</span><span class="WHIT">                </span><span class="COMM">// write s to some special place</span><span class="WHIT">
+</span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+</span><span class="WHIT">            </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">w</span><span class="PUNC">;</span><span class="WHIT">
+</span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+</span><span class="WHIT">        </span><span class="COMM">// tell pjscrape to use your writer</span><span class="WHIT">
+</span><span class="WHIT">        </span><span class="NAME">pjs.config</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+</span><span class="WHIT">            </span><span class="NAME">writer</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'myWriter'</span><span class="WHIT">
+</span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span></pre>
+				
+            
+
+<!-- ============================== constructor summary ==================== -->			
+			
+            
+            
+
+
+<!-- ============================== static properties summary ===================== -->
+			
+				
+				
+                    <h2>Static Fields</h2>
+                    <table class="summaryTable" cellspacing="0">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col" width="100%">Field</th>
+        </tr>
+    </thead>
+    <tbody>
+    
+        <tr class="row0">
+            <td>
+                
+            </td>
+            <td class="nameDescription">
+                <div class="fixedFont">
+                pjs.writers.<b><a href="../symbols/pjs.writers.html#.file">file</a></b>
+                <span class="datatype">:{Writer}</span>
+                </div>
+                <div class="description">
+                    
+                    
+                    
+                    Writes output to config.outFile
+                </div>
+            </td>
+        </tr>
+    
+        <tr class="row1">
+            <td>
+                
+            </td>
+            <td class="nameDescription">
+                <div class="fixedFont">
+                pjs.writers.<b><a href="../symbols/pjs.writers.html#.itemfile">itemfile</a></b>
+                <span class="datatype">:{Writer}</span>
+                </div>
+                <div class="description">
+                    
+                    
+                    
+                    Writes output to one file per item.
+                </div>
+            </td>
+        </tr>
+    
+        <tr class="row0">
+            <td>
+                
+            </td>
+            <td class="nameDescription">
+                <div class="fixedFont">
+                pjs.writers.<b><a href="../symbols/pjs.writers.html#.stdout">stdout</a></b>
+                <span class="datatype">:{Writer}</span>
+                </div>
+                <div class="description">
+                    
+                    
+                    
+                    Write output to STDOUT
+                </div>
+            </td>
+        </tr>
+    
+    </tbody>
+</table>
+				
+			
+
+<!-- ============================== static methods summary ======================== -->
+			
+
+
+<!-- ============================== instance properties summary ===================== -->
+			
+				
+				
+			
+
+<!-- ============================== instance methods summary ======================== -->
+			
+            
+<!-- ============================== events summary ======================== -->
+			
+
+<!-- ============================== constructor details ==================== -->		
+			
+			<div class="details"><a name="constructor"> </a>
+				<div class="sectionTitle">
+					Namespace Detail
+				</div>
+				
+				<div class="fixedFont membername">
+						<b>pjs.writers</b>
+				</div>
+                
+                
+				
+                
+                
+                <dl class="detailList">
+					
+					
+					
+					
+                </dl>
+
+			</div>
+			
+
+<!-- ============================== static field details ========================== -->		
+			
+                
+				
+                    <div class="sectionTitle">Static Field Details</div>
+                    
+    <a name=".file"> </a>
+    <div class="fixedFont membertitle">
+    <span class="parent">pjs.writers.</span><span class="membername">file</span>
+    
+    <span class="datatype">:{Writer}</span>
+    </div>
+    
+    <div class="description">
+        
+        
+        
+        Writes output to config.outFile
+    </div>
+    
+    
+
+    
+        
+        
+    <dl class="detailList">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </dl>
+
+    <a name=".itemfile"> </a>
+    <div class="fixedFont membertitle">
+    <span class="parent">pjs.writers.</span><span class="membername">itemfile</span>
+    
+    <span class="datatype">:{Writer}</span>
+    </div>
+    
+    <div class="description">
+        
+        
+        
+        Writes output to one file per item. Items may be providedin the format <code>{ filename: "file.txt", content: "string" }</code>if you'd like to specify the filename in the scraper. Otherwise,files are written to config.outFile with serial numbering.
+    </div>
+    
+    
+
+    
+        
+        
+    <dl class="detailList">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </dl>
+
+    <a name=".stdout"> </a>
+    <div class="fixedFont membertitle">
+    <span class="parent">pjs.writers.</span><span class="membername">stdout</span>
+    
+    <span class="datatype">:{Writer}</span>
+    </div>
+    
+    <div class="description">
+        
+        
+        
+        Write output to STDOUT
+    </div>
+    
+    
+
+    
+        
+        
+    <dl class="detailList">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </dl>
+
+				
+			
+
+<!-- ============================== static method details ========================= -->		
+			
+            
+<!-- ============================== instance field details ========================== -->		
+			
+
+<!-- ============================== static method details ========================= -->		
+			
+			
+<!-- ============================== event details ========================= -->		
+			
+		
+<!-- ============================== footer ================================= -->
+		<div class="fineprint" style="clear:both">
+			&copy;2011 Nick Rabinowitz<br />
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jul 29 2011 14:31:11 GMT-0700 (PDT)
+		</div>
+	</body>
+</html>
