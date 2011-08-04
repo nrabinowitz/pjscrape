@@ -15,6 +15,7 @@
 
 /*
  TODO:
+ - Get the HTTP response code for the loaded page and fail if it's 40x or 50x
  - tests for client utilities?
  - docs for the Logger, Formatter, Writer, and HashFunction interfaces?
  - test for file writes
@@ -391,6 +392,7 @@ var pjs = (function(){
                             filename = fileparts.join('.') + '-' + (count++) + '.' + ext;
                         }
                         phantom.saveToFile(formatter.format(item), filename, 'w');
+                        count++;
                     });
                 }
             };
@@ -469,7 +471,7 @@ var pjs = (function(){
             var page = new WebPage();
             // set up console output
             page.onConsoleMessage = function(msg, line, id) {
-                id = id || 'pjscrape.js or injected code';
+                id = id || 'injected code';
                 if (line) msg += ' (' + id + ' line ' + line + ')';
                 log.msg('CLIENT: ' + msg);
             };
