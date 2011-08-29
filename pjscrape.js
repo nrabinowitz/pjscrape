@@ -17,7 +17,7 @@ phantom.injectJs('lib/md5.js');
  
 function fail(msg) {
     console.log('FATAL ERROR: ' + msg);
-    phantom.exit();
+    phantom.exit(1);
 };
 
 /**
