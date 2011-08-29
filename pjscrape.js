@@ -13,20 +13,6 @@
  * @version 0.1
  */
 
-/*
- TODO:
- - Get the HTTP response code for the loaded page and fail if it's 40x or 50x
- - tests for client utilities?
- - docs for the Logger, Formatter, Writer, and HashFunction interfaces?
- - test for file writes
- - Some sort of test harness (as a bookmarklet, maybe?) to do client-side scraper dev
-   (could call in a file that's hosted on github, or just do the whole thing in 
-   a bookmarklet - not much code I think) - I'm thinking either pop-up window or just
-   code injection + console. pjs.addSuite or pjs.addScraper would run immediately, returning
-   scraper results. pjs.config() would be moot, I think.
- - Better docs, obviously.
-*/
-
 phantom.injectJs('lib/md5.js');
  
 function fail(msg) {
@@ -252,7 +238,7 @@ var pjs = (function(){
      * an array is provided, multipled items will be added.
      * @example
         // create a new writer
-        pjs.writer.myWriter = function(log) {
+        pjs.writers.myWriter = function(log) {
             var w = new pjs.writers.base(log);
             w.write = function(s) {
                 // write s to some special place
