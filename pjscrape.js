@@ -463,6 +463,28 @@ var pjs = (function(){
             };
             page.onAlert = function(msg) { log.alert('CLIENT: ' + msg) };
             
+            // add waitFor method
+            page.waitFor = function(test, callback) {
+                // check for short-circuit
+                if (this.evaluate(test)) {
+                    callback(page);
+                } else {
+                    // poll until timeout or success
+                    var elapsed = 0,
+                        timeoutId = window.setInterval(function() {
+                            if (page.evaluate(test) || elapsed > config.timeoutLimit) {
+                                if (elapsed > config.timeoutLimit) {
+                                    log.alert('Timeout after ' + ~~(elapsed / 1000) + ' seconds');
+                                }
+                                window.clearInterval(timeoutId);
+                                callback(page);
+                            } else {
+                                elapsed += config.timeoutInterval;
+                            }
+                        }, config.timeoutInterval);
+                }
+            };
+            
             mgr.getPage = function() {
                 return page;
             };
@@ -552,27 +574,7 @@ var pjs = (function(){
             run: function() {
                 var s = this,
                     scrapers = s.opts.scrapers,
-                    i = 0;
-                log.msg(s.title + " starting");
-                // set up scraper functions
-                var scrapePage = function(page) {
-                        if (page.evaluate(s.opts.scrapable)) {
-                            // load script(s) if necessary
-                            if (s.opts.loadScript) {
-                                s.opts.loadScript.forEach(function(script) {
-                                    page.injectJs(script);
-                                })
-                            }
-                            // run prescrape
-                            page.evaluate(s.opts.preScrape);
-                            // run each scraper and send any results to writer
-                            if (scrapers && scrapers.length) {
-                                scrapers.forEach(function(scraper) {
-                                    s.addItem(page.evaluate(scraper))
-                                });
-                            }
-                        }
-                    },
+                    i = 0,
                     // get base URL for avoiding repeat visits and recursion loops
                     baseUrl = function(url) {
                         return s.opts.newHashNewPage ? url.split('#')[0] : url;
@@ -595,6 +597,7 @@ var pjs = (function(){
                         }
                         runNext();
                     };
+                log.msg(s.title + " starting");
                 // run each
                 var runCounter = 0
                 function runNext() {
@@ -605,7 +608,7 @@ var pjs = (function(){
                             runNext();
                         } else {
                             // scrape this url
-                            s.scrape(url, scrapePage, complete);
+                            s.scrape(url, scrapers, complete);
                         }
                     } else {
                         s.complete();
@@ -621,8 +624,9 @@ var pjs = (function(){
              * @param {Function} complete   Callback function to run when complete
              * @private
              */
-            scrape: function(url, scrapePage, complete) {
-                var opts = this.opts,
+            scrape: function(url, scrapers, complete) {
+                var suite = this,
+                    opts = suite.opts,
                     page = SuiteManager.getPage();
                 log.msg('Opening ' + url);
                 // run the scrape
@@ -645,26 +649,25 @@ var pjs = (function(){
                             });
                         }
                         // run scraper(s)
-                        if (page.evaluate(opts.ready)) {
-                            // run immediately
-                            scrapePage(page);
+                        page.waitFor(opts.ready, function(page) {
+                            if (page.evaluate(opts.scrapable)) {
+                                // load script(s) if necessary
+                                if (opts.loadScript) {
+                                    opts.loadScript.forEach(function(script) {
+                                        page.injectJs(script);
+                                    })
+                                }
+                                // run prescrape
+                                page.evaluate(opts.preScrape);
+                                // run each scraper and send any results to writer
+                                if (scrapers && scrapers.length) {
+                                    scrapers.forEach(function(scraper) {
+                                        suite.addItem(page.evaluate(scraper))
+                                    });
+                                }
+                            }
                             complete(page);
-                        } else {
-                            // poll ready() until timeout or success
-                            var elapsed = 0,
-                                timeoutId = window.setInterval(function() {
-                                    if (page.evaluate(opts.ready) || elapsed > config.timeoutLimit) {
-                                        if (elapsed > config.timeoutLimit) {
-                                            log.alert('Ready timeout after ' + ~~(elapsed / 1000) + ' seconds');
-                                        }
-                                        scrapePage(page);
-                                        window.clearInterval(timeoutId);
-                                        complete(page);
-                                    } else {
-                                        elapsed += config.timeoutInterval;
-                                    }
-                                }, config.timeoutInterval);
-                        }
+                        });
                     } else {
                         log.error('Page did not load: ' + url);
                         complete(false);
