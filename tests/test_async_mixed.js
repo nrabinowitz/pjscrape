@@ -10,13 +10,9 @@ pjs.addSuite({
             scraper: function() {
                 $('#clkme').click();
                 // now wait for content...
-                var i = 0
-                _pjs.intervalId = window.setInterval(function() {
-                    if ($('#ajax_content li').length) {
-                        _pjs.items = _pjs.getText('#ajax_content li');
-                        window.clearInterval(_pjs.intervalId);
-                    }
-                }, 100);
+                _pjs.waitForElement('#ajax_content li', function() {
+                    _pjs.items = _pjs.getText('#ajax_content li');
+                });
             }
         },
         function() {

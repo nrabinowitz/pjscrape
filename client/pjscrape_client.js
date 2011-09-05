@@ -72,6 +72,33 @@ window._pjs = (function($) {
     }
     
     /**
+     * Wait for a condition to occur, then execute the callback
+     * @name _pjs.waitFor
+     * @param {Function} test       Test function; should return true when ready
+     * @param {Function} callback   Callback function to execute
+     */
+    function waitFor(test, callback) {
+        var intervalId = window.setInterval(function() {
+            if (test()) {
+                window.clearInterval(intervalId);
+                callback();
+            }
+        }, 100);
+    }
+    
+    /**
+     * Wait for an element to appear, then execute the callback
+     * @name _pjs.waitForElement
+     * @param {String} selector     JQuery selector to look for
+     * @param {Function} callback   Callback function to execute
+     */
+    function waitForElement(selector, callback) {
+        waitFor(function() {
+            return !!$(selector).length;
+        }, callback);
+    }
+    
+    /**
      * Flag that will be set to true when $(document).ready is called. 
      * Generally your code will not need to deal with this - use the "ready"
      * configuration parameter instead.
@@ -84,6 +111,8 @@ window._pjs = (function($) {
         toFullUrl: toFullUrl,
         getAnchorUrls: getAnchorUrls,
         getText: getText,
+        waitFor: waitFor,
+        waitForElement: waitForElement,
         /**
          * Reference to jQuery. This is guaranteed to be
          * the pjscrape.js version of the jQuery library.
