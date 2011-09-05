@@ -103,4 +103,4 @@ window._pjs.$(function() {
 
 // for reasons I can't fathom, omitting this line throws an
 // error on pages with <input type="image">. Go figure.
-console.log('Client-side code initialized');
+console.log('___ Client-side code initialized');

@@ -88,6 +88,14 @@ class TestPjscrape(unittest.TestCase):
         out = getPjscrapeOutput('test_ready.js')
         self.assertEqual(out, '["Content 1","Content 2"]')
             
+    def test_async(self):
+        out = getPjscrapeOutput('test_async.js')
+        self.assertEqual(out, '["Content 1","Content 2"]')
+            
+    def test_async_mixed(self):
+        out = getPjscrapeOutput('test_async_mixed.js')
+        self.assertEqual(out, '["Other Content 1","Other Content 2","Content 1","Content 2"]')
+            
     def test_jquery_versions(self):
         out = getPjscrapeOutput('test_jquery_versions.js')
         self.assertEqual(out, '["1.6.1","1.6.1","1.4.1","1.6.1"]')
@@ -104,6 +112,14 @@ class TestPjscrape(unittest.TestCase):
     def test_img_input(self):
         out = getPjscrapeOutput('test_img_input.js')
         self.assertEqual(out, '["Test Page: Weird Image Input Issue"]')
+        
+    def test_timeout_ready(self):
+        out = getPjscrapeOutput('test_timeout_ready.js')
+        self.assertEqual(out, '["Page 1","Page 2"]')
+        
+    def test_timeout_async(self):
+        out = getPjscrapeOutput('test_timeout_async.js')
+        self.assertEqual(out, '[]')
         
 if __name__ == '__main__':
     # run tests

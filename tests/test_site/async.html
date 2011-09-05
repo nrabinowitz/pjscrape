@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+    <title>TEST</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        $('#clkme').click(function() {
+            window.setTimeout(function() {
+                $('#ajax_content').load('ajax_content.html');
+            }, 1000)
+        });
+    })
+    </script>
+  </head> 
+  <body>
+    <h1>Test Page: AJAX-loaded async UI</h1>
+    
+    <button id="clkme">Click Me</button>
+    <div id="ajax_content"></div>
+    
+    <span id="other1">Other Content 1</span>
+    <span id="other2">Other Content 2</span>
+    
+  </body>
+</html>

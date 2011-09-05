@@ -43,6 +43,9 @@ var pjs = (function(){
     function isFunction(f) {
         return typeof f === 'function';
     }
+    function isObject(o) {
+        return typeof o === 'object';
+    }
     function funcify(f) {
         return isFunction(f) ? f : function() { return f };
     }
@@ -457,6 +460,8 @@ var pjs = (function(){
             var page = new WebPage();
             // set up console output
             page.onConsoleMessage = function(msg, line, id) {
+                // kill initialization message
+                if (msg.indexOf('___') === 0) return;
                 id = id || 'injected code';
                 if (line) msg += ' (' + id + ' line ' + line + ')';
                 log.msg('CLIENT: ' + msg);
@@ -596,10 +601,9 @@ var pjs = (function(){
                             }
                         }
                         runNext();
-                    };
-                log.msg(s.title + " starting");
+                    },
+                    runCounter = 0;
                 // run each
-                var runCounter = 0
                 function runNext() {
                     if (runCounter < s.urls.length) {
                         url = baseUrl(s.urls[runCounter++]);
@@ -614,6 +618,7 @@ var pjs = (function(){
                         s.complete();
                     }
                 }
+                log.msg(s.title + " starting");
                 runNext();
             },
             
@@ -661,12 +666,41 @@ var pjs = (function(){
                                 page.evaluate(opts.preScrape);
                                 // run each scraper and send any results to writer
                                 if (scrapers && scrapers.length) {
+                                    // set up callback manager
+                                    var i = 0;
+                                    function checkComplete() {
+                                        if (++i == scrapers.length) {
+                                            complete(page);
+                                        }
+                                    }
+                                    // run all scrapers
                                     scrapers.forEach(function(scraper) {
-                                        suite.addItem(page.evaluate(scraper))
+                                        if (isFunction(scraper)) {
+                                            // standard scraper
+                                            suite.addItem(page.evaluate(scraper));
+                                            checkComplete();
+                                        } else if (scraper.scraper) {
+                                            // wrapped scraper, more options (just async now)
+                                            if (scraper.async) {
+                                                // start the scrape
+                                                page.evaluate(scraper.scraper);
+                                                // wait for the scraper to return items
+                                                page.waitFor(
+                                                    function() {
+                                                        return _pjs.items !== undefined 
+                                                    },
+                                                    function() {
+                                                        suite.addItem(page.evaluate(function() {
+                                                            return _pjs.items;
+                                                        }));
+                                                        checkComplete();
+                                                    }
+                                                );
+                                            }
+                                        }
                                     });
                                 }
                             }
-                            complete(page);
                         });
                     } else {
                         log.error('Page did not load: ' + url);
