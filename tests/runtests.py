@@ -8,8 +8,8 @@ import os
 PORT = 8888
 COMMAND_BASE = ["pyphantomjs", os.path.join('..', 'pjscrape.js'), 'base_config.js']
 
-def getPjscrapeOutput(script_name):
-    return subprocess.check_output(COMMAND_BASE + [script_name]).strip()
+def getPjscrapeOutput(*script_name):
+    return subprocess.check_output(COMMAND_BASE + list(script_name)).strip()
 
 class QuietHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
@@ -42,6 +42,10 @@ class TestPjscrape(unittest.TestCase):
     def test_multiple_suites(self):
         out = getPjscrapeOutput('test_multiple_suites.js')
         self.assertEqual(out, '["Test Page: Index","Test Page: Page 1","Test Page: Page 2"]')
+            
+    def test_multiple_files(self):
+        out = getPjscrapeOutput('test_basic.js', 'test_multiple_suites.js')
+        self.assertEqual(out, '["Test Page: Index","Page 1","Page 2","Test Page: Page 1","Test Page: Page 2"]')
             
     def test_recursive_maxdepth(self):
         out = getPjscrapeOutput('test_recursive_maxdepth.js')
@@ -83,6 +87,10 @@ class TestPjscrape(unittest.TestCase):
     def test_syntax(self):
         out = getPjscrapeOutput('test_syntax.js')
         self.assertEqual(out, '["Test Page: Index","Page 1","Test Page: Index","Page 1","Page 2"]')
+        
+    def test_selector_scraper(self):
+        out = getPjscrapeOutput('test_selector_scraper.js')
+        self.assertEqual(out, '["Test Page: Index","Page 1","Page 2"]')
             
     def test_ready(self):
         out = getPjscrapeOutput('test_ready.js')
@@ -120,6 +128,10 @@ class TestPjscrape(unittest.TestCase):
     def test_timeout_async(self):
         out = getPjscrapeOutput('test_timeout_async.js')
         self.assertEqual(out, '[]')
+        
+    def test_404_handling(self):
+        out = getPjscrapeOutput('test_404_handling.js')
+        self.assertEqual(out, '["Test Page: Index"]')
         
 if __name__ == '__main__':
     # run tests
