@@ -1,0 +1,96 @@
+body {
+    margin-top: 1.0em;
+    background-color: #fff;
+    font-family: Helvetica, Arial, FreeSans, san-serif;
+    color: #5E441E;
+}
+#container {
+    margin: 0 auto;
+    width: 700px;
+}
+div.column {
+    float: left;
+    width: 300px;
+}
+div.column.right {
+    margin-left: 30px;
+}
+h1 { font-size: 3.8em; color: #336699; margin-bottom: 3px; }
+h1 .small { font-size: 0.4em; }
+h1 a { text-decoration: none; color: #336699;}
+h2 { font-size: 1.5em; color: #336699; }
+h3 { color: #336699; margin: 0; padding: 0}
+a { color: #27002A; }
+p, ul { margin-top: .3em; }
+.description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+.download { float: right; }
+pre, code { background: #D5DED9; color: #000;}
+code { padding: 0 .3em }
+pre { padding: 5px; }
+hr { border: 0; width: 80%; border-bottom: 1px solid #99B2B7}
+.footer { text-align:center; padding-top:30px; font-style: italic; }
+
+/* root element for tabs  */
+ul#tabs {  
+    margin:0 !important; 
+    padding:0;
+    height:30px;
+    border-bottom:1px solid #666;
+}
+
+/* single tab */
+ul#tabs li {  
+    float:left;
+    padding:0; 
+    margin:0;  
+    list-style-type:none;
+}
+
+/* link inside the tab */
+ul#tabs a { 
+    font-weight: bold;
+    float:left;
+    font-size:13px;
+    display:block;
+    padding:5px 30px;
+    text-decoration:none;
+    border:1px solid #666;
+    border-bottom:0px;
+    height:18px;
+    background-color:#efefef;
+    color:#777;
+    margin-right:2px;
+    position:relative;
+    top:1px;
+    outline:0;
+    -moz-border-radius:4px 4px 0 0;	
+}
+
+ul#tabs a:hover {
+    background-color:#F7F7F7;
+    color:#336699;
+}
+    
+/* selected tab */
+ul#tabs a.current {
+    background: #fff;
+    border-bottom: 1px solid #fff;
+    color:#336699;
+    cursor:default;
+}
+
+/* tab pane */
+#panes {
+    margin-bottom: 2em;
+}
+#panes div.pane {
+    display:none;
+    border:1px solid #666;
+    border-width:0 1px 1px 1px;
+    min-height:150px;
+    padding:15px 20px;
+}
+
+.clearfix:before, .clearfix:after { content: ""; display: table; }
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; }

@@ -1,46 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
+    <meta charset='utf-8'>
 
-  <title>pjscrape: A web-scraping framework written in Javascript, using PhantomJS and jQuery</title>
-    <link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+    <title>pjscrape: A web-scraping framework written in Javascript, using PhantomJS and jQuery</title>
+    <script src="http://cdn.jquerytools.org/1.2.5/full/jquery.tools.min.js"></script>
     <script type="text/javascript" src="prettify/prettify.js"></script>
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #fff;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #7A6A53;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    div.column {
-      float: left;
-      width: 330px;
-    }
-    div.column.right {
-      margin-left: 30px;
-    }
-    h1 { font-size: 3.8em; color: #336699; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none; color: #336699;}
-    h2 { font-size: 1.5em; color: #336699; }
-    h3 { color: #336699; margin: 0; padding: 0}
-    a { color: #27002A; }
-    p, ul { margin-top: .3em; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre, code { background: #D5DED9; color: #000;}
-    pre { padding: 5px; }
-    hr { border: 0; width: 80%; border-bottom: 1px solid #99B2B7}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+    <link href="prettify/prettify.css" type="text/css" rel="stylesheet" />
+    <link  href="style.css" type="text/css" rel="stylesheet" />
 </head>
 
-<body onload="prettyPrint()">
+<body>
   <a href="http://github.com/nrabinowitz/pjscrape"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
   <div id="container">
@@ -59,87 +29,128 @@
       A web-scraping framework written in Javascript, using PhantomJS and jQuery
     </div>
 
-    <h2>Overview</h2>
-
-<p><strong>pjscrape</strong> is a framework for anyone who's ever wanted a command-line tool for web scraping using Javascript and <a href="http://jquery.com/">jQuery</a>. Built to run with <a href="http://phantomjs.org">PhantomJS</a>, it allows you to scrape pages in a fully rendered, Javascript-enabled context from the command line, no browser required.</p> 
-
-<div class="column">
-<h3>Features</h3> 
- 
-<ul> 
-<li>Client-side, Javascript-based scraping environment with full access to jQuery functions</li> 
-<li>Easy, flexible syntax for setting up one or more scrapers</li> 
-<li>Recursive/crawl scraping</li> 
-<li>Delay scrape until a "ready" condition occurs</li> 
-<li>Load your own scripts on the page before scraping</li> 
-<li>Modular architecture for logging and writing/formatting scraped items</li> 
-<li>Client-side utilities for common tasks</li> 
-<li>Growing set of unit tests</li> 
+<!-- the tabs -->
+<ul id="tabs">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#quickstart">Quick Start</a></li>
+    <li><a href="#tutorial">Tutorial</a></li>
 </ul>
-</div>
 
-<div class="column right">    
-<h3>Download</h3>
-<p>
-  <a href="http://github.com/nrabinowitz/pjscrape/zipball/v0.1.1">pjscrape-v0.1.1.zip</a><br>
-  <a href="http://github.com/nrabinowitz/pjscrape/tarball/v0.1.1">pjscrape-v0.1.1.tar.gz</a>
-</p>
-    
-<h3>Dependencies</h3>
-<p><a href="http://code.google.com/p/phantomjs/">PhantomJS</a></p>
+<!-- tab "panes" -->
+<div id="panes">
+    <div class="pane clearfix">
+        <h2>Overview</h2>
 
-<h3>License</h3>
-<p><a href="https://raw.github.com/nrabinowitz/pjscrape/master/LICENSE.txt">MIT License</a></p>
+        <p><strong>pjscrape</strong> is a framework for anyone who's ever wanted a command-line tool for web scraping using Javascript and <a href="http://jquery.com/">jQuery</a>. Built to run with <a href="http://phantomjs.org">PhantomJS</a>, it allows you to scrape pages in a fully rendered, Javascript-enabled context from the command line, no browser required.</p> 
 
-<h3>Documentation</h3>
-<p><a href="docs/index.html">Javascript API Documentation</a></p>
+        <div class="column">
+        <h3>Features</h3> 
+         
+        <ul> 
+        <li>Client-side, Javascript-based scraping environment with full access to jQuery functions</li> 
+        <li>Easy, flexible syntax for setting up one or more scrapers</li> 
+        <li>Recursive/crawl scraping</li> 
+        <li>Delay scrape until a "ready" condition occurs</li> 
+        <li>Load your own scripts on the page before scraping</li> 
+        <li>Modular architecture for logging and writing/formatting scraped items</li> 
+        <li>Client-side utilities for common tasks</li> 
+        <li>Growing set of unit tests</li> 
+        </ul>
+        </div>
+
+        <div class="column right">    
+        <h3>Download</h3>
+        <p>
+          <a href="http://github.com/nrabinowitz/pjscrape/zipball/v0.1.1">pjscrape-v0.1.1.zip</a><br>
+          <a href="http://github.com/nrabinowitz/pjscrape/tarball/v0.1.1">pjscrape-v0.1.1.tar.gz</a><br>
+          <a href="http://github.com/nrabinowitz/pjscrape">Fork on github</a>
+        </p>
+            
+        <h3>Dependencies</h3>
+        <p>
+            <a href="http://code.google.com/p/phantomjs/">PhantomJS v.1.2</a><br>
+            <a href="http://dev.umaclan.com/projects/pyphantomjs/wiki/Plugins#Save-to-File">Save to File plugin</a> (optional)
+        </p>
+
+        <h3>License</h3>
+        <p><a href="https://raw.github.com/nrabinowitz/pjscrape/master/LICENSE.txt">MIT License</a></p>
+
+        <h3>Documentation</h3>
+        <p><a href="docs/index.html">Javascript API Documentation</a></p>
 
 
-</div>
-
-<div style="clear:both;"></div>
-
-<h2>Usage</h2> 
- 
-<ol> 
-<li><p><a href="http://code.google.com/p/phantomjs/downloads/list">Download and install PhantomJS</a> or PyPhantomJS, v.1.2. In order to use file-based logging or data writes, you'll need to use PyPhantomJS with the <a href="http://dev.umaclan.com/projects/pyphantomjs/wiki/Plugins#Save-to-File">Save to File plugin</a> (though I think this feature will be rolled into the PhantomJS core in the next version).</p></li> 
-<li><p>Make a config file to define your scraper(s). Config files can set global pjscrape settings via <code>pjs.config()</code> and add one or more scraper suites via <code>pjs.addSuite()</code> and <code>pjs.addScraper()</code>. </p></li> 
-<li> 
-<p>A scraper suite defines a set of scraper functions for one or more URLs. More docs on this coming soon, but a sample config file might look like this: </p> 
- 
+        </div>
+        
+        <p style="clear:both;">In its most concise syntax, pjscrape makes scraping a webpage as easy as this:</p>
+        
 <pre><code class="prettyprint">pjs.addSuite({
-    title: 'My Scraper Suite',
-    // single URL or array
-    urls: [
-        'http://www.example.com/page1',
-        'http://www.example.com/page2'
-    ],
-    // one or more functions, evaluated in the client
-    scrapers: [
-        function() {
-            var items = [];
-            $('h2').each(function() {
-                items.push($(this).text());
-            });
-            return items;
+    // url to scrape
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    // selector to look for
+    scraper: '#sortable_table_id_0 tr td:nth-child(2)'
+});
+// Output: ["Addison","Albany","Alburgh", ...]
+</code></pre>
+    
+    <p>And crawling a set of webpages as easy as this:</p>
+        
+<pre><code class="prettyprint">pjs.addSuite({
+    // url to start at
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    // selector to find more urls to spider
+    moreUrls: '#sortable_table_id_0 tr td:nth-child(2) a',
+    maxDepth: 1,
+    // function to get some data
+    scraper: function() {
+        return { 
+            name: $('#firstHeading').text(),
+            elevation: $('td:contains("Elevation") + td').text()
         }
-    ]
+    }
+});
+// Output: [{"name":"Addison","elevation":"89 ft (27 m)"}, ...]
+</code></pre>
+    
+    <p>Ok, that's 14 lines with comments. But it's still a pretty simple API, right?</p>
+    
+    </div>
+    <div class="pane clearfix">
+        <h2>Quick Start</h2> 
+         
+        <ol> 
+            <li><p><a href="http://code.google.com/p/phantomjs/downloads/list">Download and install PhantomJS</a> or PyPhantomJS, v.1.2. In order to use file-based logging or data writes, you'll need to use PyPhantomJS with the <a href="http://dev.umaclan.com/projects/pyphantomjs/wiki/Plugins#Save-to-File">Save to File plugin</a> (though I think this feature will be rolled into the PhantomJS core in the next version).</p></li> 
+            <li><p>Make a config file (e.g. <code>my_config.js</code>) to define your scraper(s). Config files can set global pjscrape settings via <code>pjs.config()</code> and add one or more scraper suites via <code>pjs.addSuite()</code>. </p></li> 
+            <li> 
+            <p>A scraper suite defines a set of scraper functions for one or more URLs. A simple config file might look like this: </p>         
+            
+<pre><code class="prettyprint">pjs.addSuite({
+    // single URL or array
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    // single function or array, evaluated in the client
+    scraper: function() {
+        return $('h1#firstHeading').text();
+    }
 });
 </code></pre> 
- 
-<p>A simple scraper can be added with the <code>pjs.addScraper()</code> function:</p> 
- 
-<pre><code class="prettyprint">pjs.addScraper(
-    'http://www.example.com/page.html',
-    function() {
-        return $('h1').first().text();
-    }
-);
-</code></pre> 
-</li> 
-<li><p>To run pjscrape from the command line, type:</p> <pre><code>pyphantomjs /path/to/pjscrape.js my_config_file.js</code></pre></li> 
-</ol><p>By default, the log output is pretty verbose, and the scraped data is written as JSON to stdout at the end of the scrape. You can configure logging, formatting, and writing data using <code>pjs.config()</code>:</p> 
- 
+             
+            <p>A scraper this simple can also be added with the <code>pjs.addScraper(url, scraper)</code> convenience function.</p>
+            </li> 
+            <li><p>To run pjscrape from the command line, type:</p> 
+            
+<pre><code>~> pyphantomjs /path/to/pjscrape.js my_config.js
+* Suite 0 starting
+* Opening http://en.wikipedia.org/wiki/List_of_towns_in_Vermont
+* Scraping http://en.wikipedia.org/wiki/List_of_towns_in_Vermont
+* Suite 0 complete
+* Writing 1 items
+["List of towns in Vermont"]
+* Saved 1 items
+</code></pre>
+    
+            <p>By default, the log output is pretty verbose, and the scraped data is written as JSON to stdout at the end of the scrape.</p>
+            </li>
+            <li><p>You can configure logging, formatting, and writing data using <code>pjs.config()</code>:</p> 
+            
 <pre><code class="prettyprint">pjs.config({ 
     // options: 'stdout', 'file' (set in config.logFile) or 'none'
     log: 'stdout',
@@ -149,15 +160,142 @@
     writer: 'file',
     outFile: 'scrape_output.json'
 });
-</code></pre> 
+</code></pre>
 
+            </li>
+        </ol>
+    </div>
+    <div class="pane clearfix">
+        <h2>Tutorial</h2>
+        <h3>Writing Scrapers</h3>
+        <p>The core of a pjscrape script is the definition of one or more scraper functions. Here's what you need to know:
+        <ul>
+            <li>
+                <p>Scraper functions are evaluated in a <strong>full browser context.</strong> This means you not only have access to the DOM, you have access to Javascript variables and functions, AJAX-loaded content, etc.</p>
+                    
+<pre><code class="prettyprint">pjs.addSuite({
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    scraper: function() {
+        return wgPageName; // variable set by Wikipedia
+    }
+});
+// Output: ["List_of_towns_in_Vermont"]
+</code></pre>
+            </li>
+            <li>
+                <p>Scraper functions are <strong>evaluated in a sandbox</strong> (<a href="http://code.google.com/p/phantomjs/wiki/QuickStart#Code_Evaluation">read more here</a>). Closures <em>will not work</em> the way you think</a>:</p>
 
-<h2>Author</h2>
-<p>pjscrape is (c) 2011 by <a href="http://www.nickrabinowitz.com">Nick Rabinowitz</a>.</p>
-<p>Comments welcomed at nick (at) nickrabinowitz (dot) com.</p>
+<pre><code class="prettyprint">var myPrivateVariable = "test";
+pjs.addSuite({
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    scraper: function() {
+        return myPrivateVariable;
+    }
+});
+// CLIENT: ReferenceError: Can't find variable: myPrivateVariable
+</code></pre>
+
+                <p>The best way to think about your scraper functions is to assume the code is being <code>eval()</code>'d in the context of the page you're trying to scrape.</p>
+            </li>
+            <li>
+                <p>Scrapers have access to a <strong>set of helper functions</strong> in the <code>_pjs</code> namespace. See the <a href="docs/symbols/_pjs.html">Javascript API docs</a> for more info. One particularly useful function is <code>_pjs.getText()</code>, which returns an array of text from the matched elements:</p>
+
+<pre><code class="prettyprint">pjs.addSuite({
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    scraper: function() {
+        return _pjs.getText('#sortable_table_id_0 tr td:nth-child(2)');
+    }
+});
+// Output: ["Addison","Albany","Alburgh", ...]
+</code></pre>
+                <p>For this instance, there's actually a shorter syntax - if your scraper is a string instead of a function, pjscrape will assume it is a selector and use it in a function like the one above:</p>
+
+<pre><code class="prettyprint">pjs.addSuite({
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    scraper: '#sortable_table_id_0 tr td:nth-child(2)'
+});
+// Output: ["Addison","Albany","Alburgh", ...]
+</code></pre>
+
+            </li>
+            <li>
+                <p>Scrapers can return data in <strong>whatever format you want</strong>, provided it's JSON-serializable (so you can't return a jQuery object, for example). For example, the following code returns the list of towns in the <a href="https://docs.djangoproject.com/en/1.3/howto/initial-data/">Django fixture syntax</a>:</p>
+
+<pre><code class="prettyprint">pjs.addSuite({
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    scraper: function() {
+        return $('#sortable_table_id_0 tr').slice(1).map(function() {
+            var name = $('td:nth-child(2)', this).text(),
+                county = $('td:nth-child(3)', this).text(),
+                // convert relative URLs to absolute
+                link = _pjs.toFullUrl(
+                    $('td:nth-child(2) a', this).attr('href')
+                );
+            return {
+                model: "myapp.town",
+                fields: {
+                    name: name,
+                    county: county,
+                    link: link
+                }
+            }
+        }).toArray(); // don't forget .toArray() if you're using .map()
+    }
+});
+/* Output: 
+[{"fields":{"link":"http://en.wikipedia.org/wiki/Addison,_Vermont",
+"county":"Addison","name":"Addison"},"model":"myapp.town"}, ...]
+*/
+</code></pre>
+
+            </li>
+            <li>
+                <p>Scraper functions can always access <strong>the version of jQuery bundled with pjscrape</strong> (currently v.1.6.1). If you're scraping a site that also uses jQuery, and you want the latest features, you can set <code>noConflict: true</code> and use the <code>_pjs.$</code> variable:</p>
+
+<pre><code class="prettyprint">pjs.addSuite({
+    url: 'http://en.wikipedia.org/wiki/List_of_towns_in_Vermont',
+    noConflict: true,
+    scraper: function() {
+        return [
+            window.$().jquery, // the version Wikipedia is using
+            _pjs.$().jquery // the version pjscrape is using
+        ];
+    }
+});
+// Output: ["1.4.2","1.6.1"]
+</code></pre>
+
+            </li>
+        </ul>
+        
+        <h3>Asynchronous Scraping</h3>
+        <p>Docs coming soon. For now, see:</p>
+        <ul>
+            <li><a href="https://github.com/nrabinowitz/pjscrape/blob/master/tests/test_ready.js">Test for the ready option</a> - wait for a ready condition before starting the scrape.</li>
+            <li><a href="https://github.com/nrabinowitz/pjscrape/blob/master/tests/test_async.js">Test for asyncronous scrapes</a> - scraper function is expected to set <code>_pjs.items</code> when its scrape is complete.</li>
+        </ul>
+        
+        <h3>Crawling Multiple Pages</h3>
+        <p>Docs coming soon - the main thing is to set the <code>moreUrls</code> option to either a function or a selector that identifies more URLs to scrape. For now, see:</p>
+        <ul>
+            <li><a href="https://github.com/nrabinowitz/pjscrape/blob/master/tests/test_recursive_nomaxdepth.js">Test for basic recursive scrape</a></li>
+            <li><a href="https://github.com/nrabinowitz/pjscrape/blob/master/tests/test_recursive_maxdepth.js">Test for recursive scrape, setting maximum scrape depth</a></li></li>
+            <li><a href="https://github.com/nrabinowitz/pjscrape/blob/master/tests/test_recursive_selector.js">Test for recursive scrape, using a selector to find more URLs</a></li></li>
+        </ul>
+    </div>
+
+</div>
+
+<p>pjscrape is (c) 2011 by <a href="http://www.nickrabinowitz.com">Nick Rabinowitz</a>. Comments welcomed at nick (at) nickrabinowitz (dot) com.</p>
 
   </div>
   
-  
+<script> 
+$(function() {
+    prettyPrint();
+    $("#tabs").tabs("#panes > div", { history: true });
+});
+</script>
+
 </body>
 </html>
