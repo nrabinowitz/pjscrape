@@ -588,6 +588,12 @@ var pjs = (function(){
                     complete = function(page) {
                         // recurse if necessary
                         if (page && s.opts.moreUrls) {
+                            // allow selector-only spiders
+                            if (typeof s.opts.moreUrls == 'string') {
+                                s.opts.moreUrls = new Function(
+                                    "return _pjs.getAnchorUrls('" + s.opts.moreUrls + "');"
+                                );
+                            }
                             // look for more urls on this page
                             var moreUrls = page.evaluate(s.opts.moreUrls);
                             if (moreUrls && (!s.opts.maxDepth || s.depth < s.opts.maxDepth)) {

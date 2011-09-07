@@ -55,6 +55,10 @@ class TestPjscrape(unittest.TestCase):
         out = getPjscrapeOutput('test_recursive_nomaxdepth.js')
         self.assertEqual(out, '["Test Page: Index","Test Page: Page 1","Test Page: Page 2","Test Page: Page 3","Test Page: Page 4"]')
             
+    def test_recursive_selector(self):
+        out = getPjscrapeOutput('test_recursive_selector.js')
+        self.assertEqual(out, '["Test Page: Index","Test Page: Page 1","Test Page: Page 2","Test Page: Page 3","Test Page: Page 4"]')
+            
     def test_recursive_noloop(self):
         out = getPjscrapeOutput('test_recursive_noloop.js')
         self.assertEqual(out, '["Test Page: Loop 1","Test Page: Loop 2"]')
