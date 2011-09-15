@@ -650,7 +650,7 @@ var pjs = (function(){
                 page.open(url, function(status) {
                     // check for load errors
                     if (status != "success") {
-                        log.error('Page did not load: ' + url);
+                        log.error('Page did not load (status=' + status + '): ' + url);
                         complete(false);
                     }
                     // look for 4xx or 5xx status codes
