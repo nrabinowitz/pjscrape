@@ -21,8 +21,10 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
     window._pjs$ = jQuery.noConflict(true);
     // nesting ensures proper load order
     _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/pjscrape_client.js', function() {
-        console.log('Pjscrape harness initialized.');
-        console.log('(assumes noConflict - use _pjs.$ to access jQuery)');
+        console.log('Pjscrape harness initialized (assumes noConflict - use _pjs.$ to access jQuery)');
+        
+        // XXX: Eventually, add support for pjs.addSuite() here
+        
     });
 });
 
