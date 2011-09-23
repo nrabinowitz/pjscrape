@@ -18,8 +18,8 @@ function _pjs_getScript(url, success){
 }
 
 // utils copied from core code
-function funcify(f) {
-    return isFunction(f) ? f : function() { return f };
+function isFunction(f) {
+    return typeof f === 'function';
 }
 function isArray(a) {
     return Array.isArray(a);
