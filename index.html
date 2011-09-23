@@ -34,6 +34,7 @@
     <li><a href="#overview">Overview</a></li>
     <li><a href="#quickstart">Quick Start</a></li>
     <li><a href="#tutorial">Tutorial</a></li>
+    <li><a href="#bookmarklet">Bookmarklet</a></li>
 </ul>
 
 <!-- tab "panes" -->
@@ -282,6 +283,17 @@ pjs.addSuite({
             <li><a href="https://github.com/nrabinowitz/pjscrape/blob/master/tests/test_recursive_maxdepth.js">Test for recursive scrape, setting maximum scrape depth</a></li></li>
             <li><a href="https://github.com/nrabinowitz/pjscrape/blob/master/tests/test_recursive_selector.js">Test for recursive scrape, using a selector to find more URLs</a></li></li>
         </ul>
+    </div>
+    
+    <div class="pane clearfix">
+        <h2>Bookmarket</h2>
+        
+        <p>Pjscrape includes a bookmarklet for loading jQuery and the Pjscrape client code into the current browser context. You can use this for testing scrapers in the browser - once you've run the bookmarklet, you can run <code>pjs.addSuite</code> in your console window.</p>
+        
+        <p>To get the bookmarklet, just drag the following link to your bookmarks bar: </p>
+        
+        <p><strong><a href="javascript:(function(d,s){s=d.createElement('script');s.src='http://nrabinowitz.github.com/pjscrape/client/dev_harness.js';d.body.appendChild(s);})(document);">Load Pjscrape</a></strong></p>
+        
     </div>
 
 </div>
