@@ -43,7 +43,7 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
                 // prescrape
                 if (config.preScrape) config.preScrape();
                 // test scrapable
-                function scrapable = config.scrapable ? 
+                var scrapable = config.scrapable ? 
                     function() {
                         var test = !!config.scrapable();
                         console.log('scrapable: ' + test);
