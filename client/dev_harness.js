@@ -17,13 +17,58 @@ function _pjs_getScript(url, success){
     head.appendChild(script);
 }
 
+// utils copied from core code
+function funcify(f) {
+    return isFunction(f) ? f : function() { return f };
+}
+function isArray(a) {
+    return Array.isArray(a);
+}
+function arrify(a) {
+    return isArray(a) ? a : a ? [a] : [];
+}
+
 _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', function() {
     window._pjs$ = jQuery.noConflict(true);
     // nesting ensures proper load order
     _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/pjscrape_client.js', function() {
-        console.log('Pjscrape harness initialized (assumes noConflict - use _pjs.$ to access jQuery)');
         
-        // XXX: Eventually, add support for pjs.addSuite() here
+        window.pjs = {
+            // limited addSuite support
+            addSuite: function(config) {
+                // reassign jQuery if necessary
+                if (!config.noConflict) {
+                    window.$ = window.jQuery = window._pjs$; 
+                }
+                // prescrape
+                if (config.preScrape) config.preScrape();
+                // test scrapable
+                function scrapable = config.scrapable ? 
+                    function() {
+                        var test = !!config.scrapable();
+                        console.log('scrapable: ' + test);
+                        return test;
+                    } 
+                    : function() { return true };
+                if (scrapable()) {
+                    // run scraper(s)
+                    arrify(config.scraper || config.scrapers)
+                        .forEach(function(scraper) {
+                            if (isFunction(scraper)) {
+                                // standard scraper
+                                console.log(scraper());
+                            } else if (typeof scraper == 'string') {
+                                // selector-only scraper
+                                console.log(_pjs.getText(scraper))
+                            } else if (scraper.scraper) {
+                                // XXX: async not supported yet
+                            }
+                        });
+                }
+                // log moreUrls
+                if (config.moreUrls) console.log(config.moreUrls());
+            }
+        }
         
     });
 });
