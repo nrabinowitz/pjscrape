@@ -46,27 +46,27 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
                 var scrapable = config.scrapable ? 
                     function() {
                         var test = !!config.scrapable();
-                        console.log('scrapable: ' + test);
+                        console.log('scrapable', test);
                         return test;
                     } 
                     : function() { return true };
                 if (scrapable()) {
                     // run scraper(s)
                     arrify(config.scraper || config.scrapers)
-                        .forEach(function(scraper) {
+                        .forEach(function(scraper, i) {
                             if (isFunction(scraper)) {
                                 // standard scraper
-                                console.log(scraper());
+                                console.log('scraper ' + i, scraper());
                             } else if (typeof scraper == 'string') {
                                 // selector-only scraper
-                                console.log(_pjs.getText(scraper))
+                                console.log('scraper ' + i, _pjs.getText(scraper))
                             } else if (scraper.scraper) {
                                 // XXX: async not supported yet
                             }
                         });
                 }
                 // log moreUrls
-                if (config.moreUrls) console.log(config.moreUrls());
+                if (config.moreUrls) console.log('moreUrls', config.moreUrls());
             }
         }
         
