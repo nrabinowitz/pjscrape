@@ -67,7 +67,11 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
                 }
                 // log moreUrls
                 if (config.moreUrls) console.log('moreUrls', config.moreUrls());
-            }
+            },
+            addScraper: function(url, scraper) {
+                this.addSuite({url:url, scraper:scraper})
+            },
+            config: function() {}
         }
         
     });
