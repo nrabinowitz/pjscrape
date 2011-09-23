@@ -56,10 +56,10 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
                         .forEach(function(scraper, i) {
                             if (isFunction(scraper)) {
                                 // standard scraper
-                                console.log('scraper ' + i, scraper());
+                                console.log('scraper ' + i, JSON.stringify(scraper()));
                             } else if (typeof scraper == 'string') {
                                 // selector-only scraper
-                                console.log('scraper ' + i, _pjs.getText(scraper))
+                                console.log('scraper ' + i, JSON.stringify(_pjs.getText(scraper)));
                             } else if (scraper.scraper) {
                                 // XXX: async not supported yet
                             }
