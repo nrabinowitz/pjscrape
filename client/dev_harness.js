@@ -18,8 +18,8 @@ function _pjs_getScript(url, success){
 }
 
 // utils copied from core code
-function funcify(f) {
-    return isFunction(f) ? f : function() { return f };
+function isFunction(f) {
+    return typeof f === 'function';
 }
 function isArray(a) {
     return Array.isArray(a);
@@ -43,31 +43,35 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
                 // prescrape
                 if (config.preScrape) config.preScrape();
                 // test scrapable
-                function scrapable = config.scrapable ? 
+                var scrapable = config.scrapable ? 
                     function() {
                         var test = !!config.scrapable();
-                        console.log('scrapable: ' + test);
+                        console.log('scrapable', test);
                         return test;
                     } 
                     : function() { return true };
                 if (scrapable()) {
                     // run scraper(s)
                     arrify(config.scraper || config.scrapers)
-                        .forEach(function(scraper) {
+                        .forEach(function(scraper, i) {
                             if (isFunction(scraper)) {
                                 // standard scraper
-                                console.log(scraper());
+                                console.log('scraper ' + i, JSON.stringify(scraper()));
                             } else if (typeof scraper == 'string') {
                                 // selector-only scraper
-                                console.log(_pjs.getText(scraper))
+                                console.log('scraper ' + i, JSON.stringify(_pjs.getText(scraper)));
                             } else if (scraper.scraper) {
                                 // XXX: async not supported yet
                             }
                         });
                 }
                 // log moreUrls
-                if (config.moreUrls) console.log(config.moreUrls());
-            }
+                if (config.moreUrls) console.log('moreUrls', config.moreUrls());
+            },
+            addScraper: function(url, scraper) {
+                this.addSuite({url:url, scraper:scraper})
+            },
+            config: function() {}
         }
         
     });
