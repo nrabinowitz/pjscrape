@@ -6,7 +6,8 @@ import subprocess
 import os
 
 PORT = 8888
-COMMAND_BASE = ["pyphantomjs", os.path.join('..', 'pjscrape.js'), 'base_config.js']
+COMMAND_BASE = ["phantomjs", os.path.join('..', 'pjscrape.js'), 'base_config.js']
+OUT_FILE = 'C:\Temp\pjscrape_out.txt'
 
 def getPjscrapeOutput(*script_name):
     return subprocess.check_output(COMMAND_BASE + list(script_name)).strip()
@@ -136,6 +137,15 @@ class TestPjscrape(unittest.TestCase):
     def test_404_handling(self):
         out = getPjscrapeOutput('test_404_handling.js')
         self.assertEqual(out, '["Test Page: Index"]')
+        
+    def test_file_output(self):
+        out = getPjscrapeOutput('file_output_config.js', 'test_basic.js')
+        self.assertEqual(out, '')
+        f = open(OUT_FILE)
+        out = f.read().strip()
+        f.close()
+        self.assertEqual(out, '["Test Page: Index","Page 1","Page 2"]')
+        os.remove(OUT_FILE)
         
 if __name__ == '__main__':
     # run tests
