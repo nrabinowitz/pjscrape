@@ -7,8 +7,7 @@ Overview
 
 Dependencies
 -----------
- * [PhantomJS (or PyPhantomJS) v.1.2+](http://code.google.com/p/phantomjs/)
- * [Save to File plugin](http://dev.umaclan.com/projects/pyphantomjs/wiki/Plugins#Save-to-File) (optional, required for file writing and logging) 
+ * [PhantomJS (or PyPhantomJS) v.1.3+](http://code.google.com/p/phantomjs/)
 
 Features
 --------
