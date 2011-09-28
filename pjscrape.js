@@ -5,16 +5,18 @@
 
 /**
  * @overview
- * <p>Scraping harness for PhantomJS. Requires PhantomJS or PyPhantomJS v.1.2
- * (with saveToFile() support, if you want to use the file writer or logger).</p>
+ * <p>Scraping harness for PhantomJS. Requires PhantomJS or PyPhantomJS v.1.3
+ * </p>
  *
  * @name pjscrape.js
  * @author Nick Rabinowitz (www.nickrabinowitz.com)
  * @version 0.1
  */
 
+var fs = require('fs');
+
 phantom.injectJs('lib/md5.js');
- 
+
 function fail(msg) {
     console.log('FATAL ERROR: ' + msg);
     phantom.exit(1);
@@ -109,7 +111,7 @@ var pjs = (function(){
          */
         file: function() {
             return new loggers.base(function(msg) { 
-                phantom.saveToFile(msg + "\n", config.logFile, 'a');
+                fs.write(config.logFile, msg + "\n", 'a');
             });
         },
         
@@ -340,10 +342,10 @@ var pjs = (function(){
         file: function(log) {
             var w = new writers.base(log);
             // clear file
-            phantom.saveToFile('', config.outFile, 'w');
+            fs.write(config.outFile, '', 'w');
             // write method
             w.write = function(s) { 
-                phantom.saveToFile(s, config.outFile, 'a');
+                fs.write(config.outFile, s, 'a');
             };
             return w;
         },
@@ -380,7 +382,7 @@ var pjs = (function(){
                                 ext = fileparts.pop();
                             filename = fileparts.join('.') + '-' + (count++) + '.' + ext;
                         }
-                        phantom.saveToFile(formatter.format(item), filename, 'w');
+                        fs.write(filename, formatter.format(item), 'w');
                         count++;
                     });
                 }
@@ -784,7 +786,7 @@ var pjs = (function(){
         writers: writers,
         hashFunctions: hashFunctions,
         init: runner.init,
-        
+
         /**
          * Set one or more config variables, applying to all suites
          * @name pjs.config
@@ -801,7 +803,7 @@ var pjs = (function(){
                 config[key] = val;
             }
         },
-        
+
         /**
          * Add one or more scraper suites to be run.
          * @name pjs.addSuite
@@ -811,7 +813,7 @@ var pjs = (function(){
         addSuite: function() { 
             suites = Array.prototype.concat.apply(suites, arguments);
         },
-        
+
         /**
          * Shorthand function to add a simple scraper suite.
          * @name pjs.addScraper
@@ -840,3 +842,4 @@ if (!phantom.args.length) {
 }
 // start the scrape
 pjs.init();
+
