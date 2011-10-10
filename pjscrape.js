@@ -459,16 +459,17 @@ var pjs = (function(){
                 suiteq = [];
                 
             // create a single WebPage object for reuse
-            var page = new WebPage();
-            // set up console output
-            page.onConsoleMessage = function(msg, line, id) {
-                // kill initialization message
-                if (msg.indexOf('___') === 0) return;
-                id = id || 'injected code';
-                if (line) msg += ' (' + id + ' line ' + line + ')';
-                log.msg('CLIENT: ' + msg);
-            };
-            page.onAlert = function(msg) { log.alert('CLIENT: ' + msg) };
+            var page = require('webpage').create({
+                // set up console output
+                onConsoleMessage: function(msg, line, id) {
+                    // kill initialization message
+                    if (msg.indexOf('___') === 0) return;
+                    id = id || 'injected code';
+                    if (line) msg += ' (' + id + ' line ' + line + ')';
+                    log.msg('CLIENT: ' + msg);
+                },
+                onAlert: function(msg) { log.alert('CLIENT: ' + msg) }
+            });
             
             // add waitFor method
             page.waitFor = function(test, callback) {
