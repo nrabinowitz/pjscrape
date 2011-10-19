@@ -56,6 +56,10 @@ class TestPjscrape(unittest.TestCase):
         out = getPjscrapeOutput('test_recursive_nomaxdepth.js')
         self.assertEqual(out, '["Test Page: Index","Test Page: Page 1","Test Page: Page 2","Test Page: Page 3","Test Page: Page 4"]')
             
+    def test_recursive_scrapable(self):
+        out = getPjscrapeOutput('test_recursive_scrapable.js')
+        self.assertEqual(out, '["Test Page: Page 2","Test Page: Page 4"]')
+            
     def test_recursive_selector(self):
         out = getPjscrapeOutput('test_recursive_selector.js')
         self.assertEqual(out, '["Test Page: Index","Test Page: Page 1","Test Page: Page 2","Test Page: Page 3","Test Page: Page 4"]')
@@ -137,6 +141,10 @@ class TestPjscrape(unittest.TestCase):
     def test_404_handling(self):
         out = getPjscrapeOutput('test_404_handling.js')
         self.assertEqual(out, '["Test Page: Index"]')
+        
+    def test_getpattern(self):
+        out = getPjscrapeOutput('test_getpattern.js')
+        self.assertEqual(out, '[["Item 1","Some text 1."],["Item 2","Some special text 2."],{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},["Item 2","Some special text 2."],{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","optional":"optional text","text":"Some text 3."},{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","text":"Some text 3."},{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","optional2":"more options","text":"Some text 3."},{"name":"Item 1","text":"1."},{"name":"Item 2","text":"2."},{"name":"Item 2","text":"Some special text 2."}]')
         
     def test_file_output(self):
         out = getPjscrapeOutput('file_output_config.js', 'test_basic.js')

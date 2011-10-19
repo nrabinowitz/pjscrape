@@ -149,32 +149,34 @@ window._pjs = (function($) {
             state = 0,
             collector = isArray ? [] : {};
         }
-        function step(el) {
-            if (testBlank(el)) return;
-            var piece = pieces[state];
-            if (piece) {
-                // check for match
-                if (piece.test(el)) {
-                    // hit; scrape
-                    if (!piece.ignore) {
-                        collector[piece.key] = piece.scrape(el);
-                    }
-                    state++;
-                    // lookahead for inner patterns
-                    if (pieces[state] && pieces[state].inner) {
-                        step(el);
-                    }
-                } else if (piece.optional) {
-                    // optional; advance
-                    state++;
-                    step(el);
-                } else if (state > 0) reset(); // miss; reset
-            }
-            // save and reset if necessary
+        // save and reset if necessary
+        function checkReset() {
             if (state >= pieces.length) {
                 output.push(collector);
                 reset();
             }
+        }
+        function step(el) {
+            if (testBlank(el)) return;
+            checkReset(); // check at the beginning for trailing optional
+            var piece = pieces[state];
+            // check for match
+            if (piece.test(el)) {
+                // hit; scrape
+                if (!piece.ignore) {
+                    collector[piece.key] = piece.scrape(el);
+                }
+                state++;
+                // lookahead for inner patterns
+                if (pieces[state] && pieces[state].inner) {
+                    step(el);
+                }
+            } else if (piece.optional) {
+                // optional; advance
+                state++;
+                step(el);
+            } else if (state > 0) reset(); // miss; reset
+            checkReset();
         }
         // iterate through the contents
         reset();
