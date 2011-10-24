@@ -65,6 +65,18 @@ pjs.addSuite({
                     }
                 }
             );
+        },
+        function() {
+            return _pjs.getPattern('#set1', 
+                {
+                    name:'b:has(a)',
+                    url: {
+                        inner: true,
+                        scrape: function(el) { return $('a', el).attr('href') }
+                    },
+                    text:'text'
+                }
+            );
         }
         
     ]

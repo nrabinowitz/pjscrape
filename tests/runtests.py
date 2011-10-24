@@ -96,6 +96,10 @@ class TestPjscrape(unittest.TestCase):
     def test_syntax(self):
         out = getPjscrapeOutput('test_syntax.js')
         self.assertEqual(out, '["Test Page: Index","Page 1","Test Page: Index","Page 1","Page 2"]')
+            
+    def test_config_cascade(self):
+        out = getPjscrapeOutput('test_config_cascade.js')
+        self.assertEqual(out, '["in_config","in_suite","in_scraper"]')
         
     def test_selector_scraper(self):
         out = getPjscrapeOutput('test_selector_scraper.js')
@@ -143,8 +147,9 @@ class TestPjscrape(unittest.TestCase):
         self.assertEqual(out, '["Test Page: Index"]')
         
     def test_getpattern(self):
+        # XXX - I should probably break this up into different tests....
         out = getPjscrapeOutput('test_getpattern.js')
-        self.assertEqual(out, '[["Item 1","Some text 1."],["Item 2","Some special text 2."],{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},["Item 2","Some special text 2."],{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","optional":"optional text","text":"Some text 3."},{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","text":"Some text 3."},{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","optional2":"more options","text":"Some text 3."},{"name":"Item 1","text":"1."},{"name":"Item 2","text":"2."},{"name":"Item 2","text":"Some special text 2."}]')
+        self.assertEqual(out, '[["Item 1","Some text 1."],["Item 2","Some special text 2."],{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},["Item 2","Some special text 2."],{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","optional":"optional text","text":"Some text 3."},{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","text":"Some text 3."},{"name":"Item 1","text":"Some text 1."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 3","optional2":"more options","text":"Some text 3."},{"name":"Item 1","text":"1."},{"name":"Item 2","text":"2."},{"name":"Item 2","text":"Some special text 2."},{"name":"Item 1","text":"Some text 1.","url":"test.html"}]')
         
     def test_file_output(self):
         out = getPjscrapeOutput('file_output_config.js', 'test_basic.js')

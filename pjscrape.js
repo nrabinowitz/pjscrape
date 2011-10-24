@@ -534,10 +534,10 @@ var pjs = (function(){
                 scrapable: truef,
                 preScrape: truef,
                 hashFunction: hashFunctions.id
-            }, opts);
+            }, config, opts);
             // deal with potential arrays and syntax variants
-            s.opts.loadScript = arrify(opts.loadScripts || opts.loadScript);
-            s.opts.scrapers = arrify(opts.scrapers || opts.scraper);
+            s.opts.loadScript = arrify(s.opts.loadScripts || s.opts.loadScript);
+            s.opts.scrapers = arrify(s.opts.scrapers || s.opts.scraper);
             // set up completion callback
             s.complete = function() {
                 log.msg(s.title + " complete");
