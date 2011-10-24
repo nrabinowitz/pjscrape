@@ -32,10 +32,13 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
     window._pjs$ = jQuery.noConflict(true);
     // nesting ensures proper load order
     _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/pjscrape_client.js', function() {
+    
+        var suiteConfig = {};
         
         window.pjs = {
             // limited addSuite support
             addSuite: function(config) {
+                config = _pjs$.extend(suiteConfig, config);
                 // reassign jQuery if necessary
                 if (!config.noConflict) {
                     window.$ = window.jQuery = window._pjs$; 
@@ -71,7 +74,9 @@ _pjs_getScript('http://nrabinowitz.github.com/pjscrape/client/jquery.js', functi
             addScraper: function(url, scraper) {
                 this.addSuite({url:url, scraper:scraper})
             },
-            config: function() {}
+            config: function(opts) {
+                _pjs$.extend(suiteConfig, opts);
+            }
         }
         
     });
