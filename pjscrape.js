@@ -655,6 +655,7 @@ var pjs = (function(){
                     if (status != "success") {
                         log.error('Page did not load (status=' + status + '): ' + url);
                         complete(false);
+                        return;
                     }
                     // look for 4xx or 5xx status codes
                     var statusCodeStart = String(page.resource.status).charAt(0);
@@ -665,6 +666,7 @@ var pjs = (function(){
                             log.error('Page error code ' + page.resource.status + ' on ' + url);
                         }
                         complete(false);
+                        return;
                     }
                     // mark as visited
                     visited[url] = true;
