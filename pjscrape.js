@@ -493,6 +493,9 @@ var pjs = (function(){
                 }
             };
             
+            // add persistent state
+            page.state = {};
+            
             mgr.getPage = function() {
                 return page;
             };
@@ -678,6 +681,10 @@ var pjs = (function(){
                     });
                     // load pjscrape client-side code
                     page.injectJs('client/pjscrape_client.js');
+                    // attach persistent state
+                    page.evaluate(new Function(
+                        "_pjs.state = " + JSON.stringify(page.state) + ";"
+                    ));
                     // reset the global jQuery vars
                     if (!opts.noConflict) {
                         page.evaluate(function() {
@@ -701,6 +708,11 @@ var pjs = (function(){
                                 var i = 0;
                                 function checkComplete() {
                                     if (++i == scrapers.length) {
+                                        // save state
+                                        page.state = page.evaluate(function() {
+                                            return _pjs.state;
+                                        });
+                                        // run completion callback
                                         complete(page);
                                     }
                                 }
