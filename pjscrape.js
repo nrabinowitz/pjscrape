@@ -471,11 +471,19 @@ var pjs = (function(){
                 onAlert: function(msg) { log.alert('CLIENT: ' + msg) }
             });
             
+            page.onError = function (msg, trace) {
+                log.error('Traceback:');
+                log.error(msg);
+                trace.forEach(function (item) {
+                    log.error('  ' + item.file + ':' + item.line);
+                });
+            };
+            
             // add waitFor method
-            page.waitFor = function(test, callback) {
+            page.waitFor = function(test, callback, s, complete) {
                 // check for short-circuit
                 if (this.evaluate(test)) {
-                    callback(page);
+                    callback(page, s, complete);
                 } else {
                     // poll until timeout or success
                     var elapsed = 0,
@@ -485,7 +493,7 @@ var pjs = (function(){
                                     log.alert('Timeout after ' + ~~(elapsed / 1000) + ' seconds');
                                 }
                                 window.clearInterval(timeoutId);
-                                callback(page);
+                                callback(page, s, complete);
                             } else {
                                 elapsed += config.timeoutInterval;
                             }
@@ -609,7 +617,19 @@ var pjs = (function(){
                                 }
                             }
                         }
-                        runNext();
+                        if (page && s.opts.nextPage) {
+                            if (!s.opts.maxDepth || s.depth < s.opts.maxDepth) {
+                                if (page.evaluate(s.opts.nextPage)) {
+                                    s.depth = s.depth + 1;
+                                } else {
+                                    runNext();
+                                }
+                            } else {
+                                runNext();
+                            }
+                        } else {
+                            runNext();
+                        }
                     },
                     runCounter = 0;
                 // run each
@@ -650,100 +670,113 @@ var pjs = (function(){
                     }
                 };
                 // run the scrape
-                page.open(url, function(status) {
-                    // check for load errors
-                    if (status != "success") {
-                        log.error('Page did not load (status=' + status + '): ' + url);
-                        complete(false);
-                        return;
+                page.open(url, function (status) {
+                    suite.handleLoad(page, status, complete)
+                });
+            },
+            handleLoad: function (page, status, complete) {
+                var s = this, opts = s.opts, url;
+                // check for load errors
+                url = page.evaluate(function () { return window.location + ""; });
+                if (status != "success") {
+                    log.error('Page did not load (status=' + status + '): ' + url);
+                    complete(false);
+                    return;
+                }
+                // look for 4xx or 5xx status codes
+                var statusCodeStart = String(page.resource.status).charAt(0);
+                if (statusCodeStart == '4' || statusCodeStart == '5') {
+                    if (page.resource.status == 404) {
+                        log.error('Page not found: ' + url);
+                    } else {
+                        log.error('Page error code ' + page.resource.status + ' on ' + url);
                     }
-                    // look for 4xx or 5xx status codes
-                    var statusCodeStart = String(page.resource.status).charAt(0);
-                    if (statusCodeStart == '4' || statusCodeStart == '5') {
-                        if (page.resource.status == 404) {
-                            log.error('Page not found: ' + url);
-                        } else {
-                            log.error('Page error code ' + page.resource.status + ' on ' + url);
-                        }
-                        complete(false);
-                        return;
-                    }
-                    // mark as visited
-                    visited[url] = true;
-                    log.msg('Scraping ' + url);
-                    // load jQuery
-                    page.injectJs('client/jquery.js');
-                    page.evaluate(function() { 
-                        window._pjs$ = jQuery.noConflict(true); 
+                    complete(false);
+                    return;
+                }
+                // mark as visited
+                visited[url] = true;
+                log.msg('Scraping ' + url);
+                // load jQuery
+                page.injectJs('client/jquery.js');
+                page.evaluate(function() { 
+                    window._pjs$ = jQuery.noConflict(true); 
+                });
+                // load pjscrape client-side code
+                page.injectJs('client/pjscrape_client.js');
+                // reset the global jQuery vars
+                if (!opts.noConflict) {
+                    page.evaluate(function() {
+                        window.$ = window.jQuery = window._pjs$; 
                     });
-                    // load pjscrape client-side code
-                    page.injectJs('client/pjscrape_client.js');
-                    // reset the global jQuery vars
-                    if (!opts.noConflict) {
-                        page.evaluate(function() {
-                            window.$ = window.jQuery = window._pjs$; 
+                }
+                page.waitFor(opts.ready, s.doScraping, s, complete);
+            },
+            doScraping: function (page, suite, complete) {
+                var opts=suite.opts, scrapers=opts.scrapers;
+                if (page.evaluate(opts.scrapable)) {
+                    page.onLoadStarted = function () {
+                    }
+                    page.onLoadFinished = function (success) {
+                        suite.handleLoad(page, success, complete);
+                    }
+                    // load script(s) if necessary
+                    if (opts.loadScript) {
+                        opts.loadScript.forEach(function(script) {
+                            page.injectJs(script);
+                        })
+                    }
+                    // run prescrape
+                    page.evaluate(opts.preScrape);
+                    // run each scraper and send any results to writer
+                    if (scrapers && scrapers.length) {
+                        // set up callback manager
+                        var i = 0;
+                        function checkComplete() {
+                            if (++i == scrapers.length) {
+                                complete(page);
+                            }
+                        }
+                        // run all scrapers
+                        scrapers.forEach(function(scraper) {
+                            if (isFunction(scraper)) {
+                                // standard scraper
+                                suite.addItem(page.evaluate(scraper));
+                                checkComplete();
+                            } else if (typeof scraper == 'string') {
+                                // selector-only scraper
+                                suite.addItem(page.evaluate(new Function(
+                                    "return _pjs.getText('" + scraper + "');"
+                                )));
+                                checkComplete();
+                            } else if (scraper.scraper) {
+                                // wrapped scraper, more options (just async now)
+                                if (scraper.async) {
+                                    // start the scrape
+                                    page.evaluate(scraper.scraper);
+                                    // wait for the scraper to return items
+                                    page.waitFor(
+                                        function() {
+                                            return _pjs.items !== undefined 
+                                        },
+                                        function() {
+                                            suite.addItem(page.evaluate(function() {
+                                                return _pjs.items;
+                                            }));
+                                            checkComplete();
+                                        }
+                                    );
+                                }
+                            }
                         });
                     }
-                    // run scraper(s)
-                    page.waitFor(opts.ready, function(page) {
-                        if (page.evaluate(opts.scrapable)) {
-                            // load script(s) if necessary
-                            if (opts.loadScript) {
-                                opts.loadScript.forEach(function(script) {
-                                    page.injectJs(script);
-                                })
-                            }
-                            // run prescrape
-                            page.evaluate(opts.preScrape);
-                            // run each scraper and send any results to writer
-                            if (scrapers && scrapers.length) {
-                                // set up callback manager
-                                var i = 0;
-                                function checkComplete() {
-                                    if (++i == scrapers.length) {
-                                        complete(page);
-                                    }
-                                }
-                                // run all scrapers
-                                scrapers.forEach(function(scraper) {
-                                    if (isFunction(scraper)) {
-                                        // standard scraper
-                                        suite.addItem(page.evaluate(scraper));
-                                        checkComplete();
-                                    } else if (typeof scraper == 'string') {
-                                        // selector-only scraper
-                                        suite.addItem(page.evaluate(new Function(
-                                            "return _pjs.getText('" + scraper + "');"
-                                        )));
-                                        checkComplete();
-                                    } else if (scraper.scraper) {
-                                        // wrapped scraper, more options (just async now)
-                                        if (scraper.async) {
-                                            // start the scrape
-                                            page.evaluate(scraper.scraper);
-                                            // wait for the scraper to return items
-                                            page.waitFor(
-                                                function() {
-                                                    return _pjs.items !== undefined 
-                                                },
-                                                function() {
-                                                    suite.addItem(page.evaluate(function() {
-                                                        return _pjs.items;
-                                                    }));
-                                                    checkComplete();
-                                                }
-                                            );
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
-                            complete(page);
-                        }
-                    });
-                });
+                } else {
+                    complete(page);
+                }
             }
         };
+        
+        
         
         /**
          * Run the set of configured scraper suites.
