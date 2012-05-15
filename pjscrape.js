@@ -661,7 +661,7 @@ var pjs = (function(){
                         return;
                     }
                     // look for 4xx or 5xx status codes
-                    var statusCodeStart = String(page.resource.status).charAt(0);
+                    var statusCodeStart = page.resource && String(page.resource.status).charAt(0);
                     if (statusCodeStart == '4' || statusCodeStart == '5') {
                         if (page.resource.status == 404) {
                             log.error('Page not found: ' + url);
