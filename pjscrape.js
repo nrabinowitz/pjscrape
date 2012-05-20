@@ -648,8 +648,16 @@ var pjs = (function(){
                 log.msg('Opening ' + url);
                 // set up callback to look for response codes
                 page.onResourceReceived = function(res) {
+                    if(opts.debugResponse || opts.debug) {
+                      console.log('received: ' + JSON.stringify(res, undefined, 4));
+                    }
                     if (res.stage == 'end' && res.url == url) {
                         page.resource = res;
+                    }
+                };
+                page.onResourceRequested = function (req) {
+                    if(opts.debugRequest || opts.debug) {
+                        console.log('requested: ' + JSON.stringify(req, undefined, 4));
                     }
                 };
                 // run the scrape
