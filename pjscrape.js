@@ -712,7 +712,7 @@ var pjs = (function(){
                 var s = this, opts = s.opts, url;
                 // check for load errors
                 url = page.evaluate(function () { return window.location + ""; });
-                }
+                
                 // look for 4xx or 5xx status codes
                 var statusCodeStart = String(page.resource.status).charAt(0);
                 if (statusCodeStart == '4' || statusCodeStart == '5') {
