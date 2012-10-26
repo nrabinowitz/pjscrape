@@ -160,6 +160,10 @@ class TestPjscrape(unittest.TestCase):
         self.assertEqual(out, '["Test Page: Index","Page 1","Page 2"]')
         os.remove(OUT_FILE)
         
+    def test_persistent_state(self):
+        out = getPjscrapeOutput('test_persistent_state.js')
+        self.assertEqual(out, '["Page 0","Page 1","Page 2"]')
+        
 if __name__ == '__main__':
     # run tests
     suite = unittest.TestLoader().loadTestsFromTestCase(TestPjscrape)

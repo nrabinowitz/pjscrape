@@ -35,7 +35,8 @@ var pjs = (function(){
             writer: 'stdout',
             format: 'json',
             logFile: 'pjscrape_log.txt',
-            outFile: 'pjscrape_out.txt'
+            outFile: 'pjscrape_out.txt',
+            pageSettings: { },
         };
         
     var suites = [];
@@ -65,9 +66,20 @@ var pjs = (function(){
     function extend(obj) {
         Array.prototype.slice.call(arguments, 1).forEach(function(source) {
             for (var prop in source) {
-                if (source[prop] !== void 0) obj[prop] = source[prop];
+                try {
+                    //recursively merge object properties
+                    if ( source[prop].constructor==Object ) {
+                        obj[prop] = extend(obj[prop], source[prop]);
+                    } else {
+                        if (source[prop] !== void 0) obj[prop] = source[prop];
+                    }
+                } catch(e) {
+                    // Property in destination object not set; create it and set its value.
+                    obj[prop] = source[prop];
+                }
             }
         });
+        
         return obj;
     };
 
@@ -501,6 +513,9 @@ var pjs = (function(){
                 }
             };
             
+            // add persistent state
+            page.state = {};
+            
             mgr.getPage = function() {
                 return page;
             };
@@ -662,15 +677,34 @@ var pjs = (function(){
                 var suite = this,
                     opts = suite.opts,
                     page = SuiteManager.getPage();
+                
                 log.msg('Opening ' + url);
                 // set up callback to look for response codes
                 page.onResourceReceived = function(res) {
+                    if (opts.debugResponse || opts.debug) {
+                        console.log('received: ' + JSON.stringify(res, undefined, 4));
+                    }
                     if (res.stage == 'end' && res.url == url) {
                         page.resource = res;
                     }
                 };
+                page.onResourceRequested = function (req) {
+                    if (opts.debugRequest || opts.debug) {
+                        console.log('requested: ' + JSON.stringify(req, undefined, 4));
+                    }
+                };
+                
+                // set user defined pageSettings
+                page.settings = extend(page.settings, config.pageSettings);
+                
                 // run the scrape
                 page.open(url, function (status) {
+                    // check for load errors
+                    if (status != "success") {
+                        log.error('Page did not load (status=' + status + '): ' + url);
+                        complete(false);
+                        return;
+                    }
                     suite.handleLoad(page, status, complete)
                 });
             },
@@ -678,10 +712,6 @@ var pjs = (function(){
                 var s = this, opts = s.opts, url;
                 // check for load errors
                 url = page.evaluate(function () { return window.location + ""; });
-                if (status != "success") {
-                    log.error('Page did not load (status=' + status + '): ' + url);
-                    complete(false);
-                    return;
                 }
                 // look for 4xx or 5xx status codes
                 var statusCodeStart = String(page.resource.status).charAt(0);
@@ -704,6 +734,11 @@ var pjs = (function(){
                 });
                 // load pjscrape client-side code
                 page.injectJs('client/pjscrape_client.js');
+                // attach persistent state
+                page.evaluate(new Function(
+                    "_pjs.state = " + JSON.stringify(page.state) + ";"
+                ));
+
                 // reset the global jQuery vars
                 if (!opts.noConflict) {
                     page.evaluate(function() {
@@ -725,6 +760,10 @@ var pjs = (function(){
                         opts.loadScript.forEach(function(script) {
                             page.injectJs(script);
                         })
+
+                        
+                        
+                        
                     }
                     // run prescrape
                     page.evaluate(opts.preScrape);
@@ -734,6 +773,11 @@ var pjs = (function(){
                         var i = 0;
                         function checkComplete() {
                             if (++i == scrapers.length) {
+                                // save state
+                                page.state = page.evaluate(function() {
+                                    return _pjs.state;
+                                });
+                                // run completion callback
                                 complete(page);
                             }
                         }
@@ -800,6 +844,7 @@ var pjs = (function(){
                 log.msg('Saved ' + writer.count() + ' items');
                 phantom.exit();
             });
+            
             // make all suites
             suites.forEach(function(suite, i) {
                 SuiteManager.add(new ScraperSuite(
@@ -878,6 +923,6 @@ if (!phantom.args.length) {
         }
     });
 }
+
 // start the scrape
 pjs.init();
-
