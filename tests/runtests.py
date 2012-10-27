@@ -164,6 +164,10 @@ class TestPjscrape(unittest.TestCase):
         out = getPjscrapeOutput('test_persistent_state.js')
         self.assertEqual(out, '["Page 0","Page 1","Page 2"]')
         
+    def test_nextpage(self):
+        out = getPjscrapeOutput('test_nextpage.js')
+        self.assertEqual(out, '["Test Page: Next page","Test Page: Next page 2"]')
+
 if __name__ == '__main__':
     # run tests
     suite = unittest.TestLoader().loadTestsFromTestCase(TestPjscrape)
