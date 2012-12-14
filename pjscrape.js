@@ -739,6 +739,9 @@ var pjs = (function(){
                                         });
                                         // run completion callback
                                         complete(page);
+                                        if (isFunction(opts.onPageComplete)) {
+                                            opts.onPageComplete(page);
+                                        }
                                     }
                                 }
                                 // run all scrapers
@@ -776,6 +779,9 @@ var pjs = (function(){
                             }
                         } else {
                             complete(page);
+                            if (isFunction(opts.onPageComplete)) {
+                                opts.onPageComplete(page);
+                            }
                         }
                     });
                 });
