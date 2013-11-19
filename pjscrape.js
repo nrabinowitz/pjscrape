@@ -878,8 +878,10 @@ if (!phantom.args.length) {
 } else {
     // load the config file(s)
     phantom.args.forEach(function(configFile) {
-        if (!phantom.injectJs(configFile)) {
-            fail('Config file not found: ' + configFile);
+        if (configFile.indexOf(".js") !== -1) {
+            if (!phantom.injectJs(configFile)) {
+                fail('Config file not found: ' + configFile);
+            }
         }
     });
 }
