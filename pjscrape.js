@@ -29,6 +29,7 @@ function fail(msg) {
  */
 var pjs = (function(){
     var config = {
+			delayBetweenRuns: 0,
             timeoutInterval: 100,
             timeoutLimit: 3000,
             log: 'stdout',
@@ -636,7 +637,9 @@ var pjs = (function(){
                             runNext();
                         } else {
                             // scrape this url
-                            s.scrape(url, scrapers, complete);
+							window.setTimeout(function() {
+								s.scrape(url, scrapers, complete);
+							},config.delayBetweenRuns);
                         }
                     } else {
                         s.complete();
