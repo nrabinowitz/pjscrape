@@ -37,7 +37,7 @@ window._pjs = (function($) {
         // non-existent, or fully qualified already
         if (!url || url.indexOf(base) === 0 || !isLocalUrl(url)) return url;
         // absolute url beginning with // (same protocol as the current location)
-        if(url[0] == '/' && url[1] == '/') return loc.protocol + url;
+        if (url.indexOf('//') === 0) return loc.protocol + url;
         // absolute url
         if (url[0] == '/') return base + url;
         // relative url - browser can figure out ..
