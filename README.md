@@ -1,9 +1,9 @@
-Homepage: http://nrabinowitz.github.com/pjscrape/
+Homepage: http://nrabinowitz.github.io/pjscrape/
 
 Overview
 --------
 
-**pjscrape** is a framework for anyone who's ever wanted a command-line tool for web scraping using Javascript and [jQuery](http://jquery.com/). Built to run with [PhantomJS](http://phantomjs.org), it allows you to scrape pages in a fully rendered, Javascript-enabled context from the command line, no browser required.
+**pjscrape** is a framework for anyone who's ever wanted a command-line tool for web scraping using Javascript and [jQuery](http://jquery.com). Built for [PhantomJS](http://phantomjs.org), it allows you to scrape pages in a fully rendered, Javascript-enabled context from the command line, no browser required.
 
 Dependencies
 -----------
@@ -21,6 +21,6 @@ Features
  * Client-side utilities for common tasks
  * Growing set of unit tests
 
-Please see http://nrabinowitz.github.com/pjscrape/ for usage, examples, and documentation.
+Please see http://nrabinowitz.github.io/pjscrape/ for usage, examples, and documentation.
 
-Comments and questions welcomed at nick (at) nickrabinowitz (dot) com.
+**Comments and questions welcomed at:** nick (at) nickrabinowitz (dot) com.
