@@ -352,13 +352,14 @@ var pjs = (function(){
          * @name pjs.writers.file
          * @type Writer
          */
-        file: function(log) {
+		file: function(log) {
+			// config.encoding can be set to any of the string encodings supported in Qt: http://doc.qt.io/qt-4.8/qtextcodec.html
             var w = new writers.base(log);
             // clear file
-            fs.write(config.outFile, '', 'w');
+            fs.write(config.outFile, '', { mode: 'w', charset: config.encoding || 'UTF-8' });
             // write method
-            w.write = function(s) {
-                fs.write(config.outFile, s, 'a');
+            w.write = function(s) { 
+                fs.write(config.outFile, s, { mode: 'w', charset: config.encoding || 'UTF-8' } );
             };
             return w;
         },
