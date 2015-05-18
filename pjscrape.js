@@ -12,7 +12,7 @@
  * @author Nick Rabinowitz (www.nickrabinowitz.com)
  * @version 0.1
  */
-
+var system = require('system');
 var fs = require('fs');
 
 phantom.injectJs('lib/md5.js');
@@ -872,16 +872,15 @@ var pjs = (function(){
     };
 }());
 
-
 // make sure we have a config file
-if (!phantom.args.length) {
+if (system.args.length<=1) {
     // die
     console.log('Usage: pjscrape.js <configfile.js> ...');
     phantom.exit();
 } else {
     // load the config file(s)
-    phantom.args.forEach(function(configFile) {
-        if (configFile.indexOf(".js") !== -1) {
+    system.args.forEach(function(configFile) {
+        if (configFile.indexOf(".js") !== -1 && configFile != 'pjscrape.js') {
             if (!phantom.injectJs(configFile)) {
                 fail('Config file not found: ' + configFile);
             }
